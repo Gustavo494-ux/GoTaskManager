@@ -1,4 +1,4 @@
-package configurations
+package configuracoes
 
 import (
 	"GoTaskManager/pkg/pacotes/GerenciadorArquivosConfig"
@@ -10,23 +10,22 @@ import (
 
 var (
 	// Parametro
-	CaminhoRelativoArquivoConfiguracao string
+	caminhoRelativoArquivoConfiguracao_Logger string
 
 	// Preenchidas automaticamente
-	DiretorioRoot              string
-	CaminhoArquivoConfiguracao string
+	caminhoArquivoConfiguracao_Logger string
 
 	// Preenchidas por arquivo de configuração
-	CaminhoArquivoLog string
-	FormatoDataHora   string
+	caminhoArquivoLog_Logger string
+	formatoDataHora_Logger   string
 )
 
 const (
 	CaminhoRelativoPadraoArquivoLog = "\\Logs\\Logs.log"
 )
 
-func ConfigurarLogger(caminhoRelativoArquivoConfiguracao string) {
-	CaminhoRelativoArquivoConfiguracao = caminhoRelativoArquivoConfiguracao
+func ConfigurarLogger(CaminhoRelativoArquivoConfiguracao string) {
+	caminhoRelativoArquivoConfiguracao_Logger = CaminhoRelativoArquivoConfiguracao
 	buscarDiretorioRoot()
 	ConfigurarCaminhoArquivoConfiguracao()
 	ConfigurarCaminhoArquivoLog()
@@ -35,14 +34,15 @@ func ConfigurarLogger(caminhoRelativoArquivoConfiguracao string) {
 }
 
 func PreencherVariaveisLog() {
-	logger.CaminhoArquivoLog = CaminhoArquivoLog
-	logger.DiretorioRoot = DiretorioRoot
-	logger.FormatoDataHora = FormatoDataHora
+	logger.CaminhoArquivoLog = caminhoArquivoLog_Logger
+	logger.DiretorioRoot = diretorioRoot
+	logger.FormatoDataHora = formatoDataHora_Logger
 }
 
 func ConfigurarCaminhoArquivoConfiguracao() {
 	var err error
-	CaminhoArquivoConfiguracao, err = manipuladorDeArquivos.ObterCaminhoAbsolutoOuConcatenadoComRaiz(filepath.Join(DiretorioRoot, CaminhoRelativoArquivoConfiguracao))
+	caminhoArquivoConfiguracao_Logger, err = manipuladorDeArquivos.ObterCaminhoAbsolutoOuConcatenadoComRaiz(
+		filepath.Join(diretorioRoot, caminhoRelativoArquivoConfiguracao_Logger))
 	if err != nil {
 		if err != nil {
 			log.Fatal("Ocorreu um erro ao buscar o CaminhoArquivoConfiguracao", err)
@@ -52,8 +52,8 @@ func ConfigurarCaminhoArquivoConfiguracao() {
 
 func ConfigurarCaminhoArquivoLog() {
 	buscarCaminhoArquivoLog()
-	if len(CaminhoArquivoLog) == 0 {
-		caminhoCompleto := filepath.Join(DiretorioRoot, CaminhoRelativoPadraoArquivoLog)
+	if len(caminhoArquivoLog_Logger) == 0 {
+		caminhoCompleto := filepath.Join(diretorioRoot, CaminhoRelativoPadraoArquivoLog)
 
 		var err error
 
@@ -63,19 +63,19 @@ func ConfigurarCaminhoArquivoLog() {
 		}
 
 		manipuladorDeArquivos.CriarDiretorioOuArquivoSeNaoExistir(caminhoCompleto)
-		CaminhoArquivoLog, err = manipuladorDeArquivos.ObterCaminhoAbsolutoOuConcatenadoComRaiz(caminhoCompleto)
+		caminhoArquivoLog_Logger, err = manipuladorDeArquivos.ObterCaminhoAbsolutoOuConcatenadoComRaiz(caminhoCompleto)
 		if err != nil {
 			log.Fatal("Ocorreu um erro ao buscar o CaminhoArquivoLog", err)
 		}
 
-		CaminhoArquivoLog = manipuladorDeArquivos.FormatarCaminho(CaminhoArquivoLog)
+		caminhoArquivoLog_Logger = manipuladorDeArquivos.FormatarCaminho(caminhoArquivoLog_Logger)
 
 	}
 }
 
 func buscarDiretorioRoot() {
 	var err error
-	DiretorioRoot, err = manipuladorDeArquivos.BuscarDiretorioRootRepositorio()
+	diretorioRoot, err = manipuladorDeArquivos.BuscarDiretorioRootRepositorio()
 	if err != nil {
 		log.Fatal("Diretorio root do repositorio não encontrado erro: ", err)
 	}
@@ -83,8 +83,8 @@ func buscarDiretorioRoot() {
 
 func buscarCaminhoArquivoLog() {
 	var err error
-	CaminhoArquivoLog, err = GerenciadorArquivosConfig.NovoArquivoConfig(
-		manipuladorDeArquivos.FormatarCaminho(CaminhoArquivoConfiguracao)).
+	caminhoArquivoLog_Logger, err = GerenciadorArquivosConfig.NovoArquivoConfig(
+		manipuladorDeArquivos.FormatarCaminho(caminhoArquivoConfiguracao_Logger)).
 		Ler().
 		ObterValorParametro("CaminhoArquivoLog").
 		String()
@@ -95,7 +95,7 @@ func buscarCaminhoArquivoLog() {
 
 func buscarFormatoDataHora() {
 	var err error
-	FormatoDataHora, err = GerenciadorArquivosConfig.NovoArquivoConfig(CaminhoArquivoConfiguracao).Ler().ObterValorParametro("FormatoDataHora").String()
+	formatoDataHora_Logger, err = GerenciadorArquivosConfig.NovoArquivoConfig(caminhoArquivoConfiguracao_Logger).Ler().ObterValorParametro("FormatoDataHora").String()
 	if err != nil {
 		log.Fatal("Ocorreu um erro ao formato de data e hora do logger", err)
 	}
