@@ -7,10 +7,6 @@ import (
 	"strings"
 )
 
-func FormatarCaminho(caminho string) string {
-	return strings.ReplaceAll(caminho, "\\", "/")
-}
-
 // CriarArquivo cria um novo arquivo com o nome especificado no diretório fornecido.
 func CriarArquivo(caminhoDiretorio string, nomeArquivo string) (arquivo *os.File, err error) {
 	arquivo, err = os.Create(filepath.Join(FormatarCaminho(caminhoDiretorio), nomeArquivo))
@@ -232,4 +228,9 @@ func BuscarDiretorioRootRepositorio() (caminho string, err error) {
 
 		caminho = filepath.Dir(caminho)
 	}
+}
+
+// FormatarCaminho: aplica um replace substituindo "\\" por "/"
+func FormatarCaminho(caminho string) string {
+	return strings.ReplaceAll(caminho, "\\", "/")
 }
