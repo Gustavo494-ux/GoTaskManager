@@ -1,18 +1,20 @@
 package inicializar
 
-import "GoTaskManager/pkg/routines/configurations"
+import (
+	"GoTaskManager/pkg/routines/configuracoes"
+)
 
 // Inicializar: realiza todas as configurações para a inicialização do projeto
 func Inicializar() {
-	inicializarLogger()
+	InicializarLogger()
 }
 
 // InicializarParaTestes: realiza configurações para execução dos testes
 func InicializarParaTestes() {
-	inicializarLogger()
+	InicializarLogger()
 }
 
-// inicializarLogger: realize toda a configuração necessaria para utilização do logger
-func inicializarLogger() {
-	configurations.ConfigurarLogger("\\internal\\app\\config\\logger.yaml")
+// InicializarLogger: realize toda a configuração necessaria para utilização do logger
+func InicializarLogger() {
+	configuracoes.ConfigurarLogger("\\internal\\app\\config\\logger.yaml")
 }
