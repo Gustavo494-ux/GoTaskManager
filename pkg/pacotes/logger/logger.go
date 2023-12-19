@@ -10,7 +10,8 @@ import (
 type NivelLog zerolog.Level
 
 type LoggerType struct {
-	log zerolog.Logger
+	log      zerolog.Logger
+	mensagem string
 }
 
 var (
@@ -65,6 +66,7 @@ func (logger *LoggerType) configurarLog(nivelLog NivelLog) {
 
 // Fatal: cria um log de erro fatal
 func (logger *LoggerType) Fatal(mensagem string, err error, dados ...interface{}) {
+	logger.mensagem = mensagem
 	logger.log.
 		Fatal().
 		Caller(1).
@@ -75,6 +77,7 @@ func (logger *LoggerType) Fatal(mensagem string, err error, dados ...interface{}
 
 // Error: cria um log de erro
 func (logger *LoggerType) Error(mensagem string, err error, dados ...interface{}) {
+	logger.mensagem = mensagem
 	logger.log.
 		Error().
 		Caller(1).
@@ -85,6 +88,7 @@ func (logger *LoggerType) Error(mensagem string, err error, dados ...interface{}
 
 // Alerta: cria um log de Alerta
 func (logger *LoggerType) Alerta(mensagem string, dados ...interface{}) {
+	logger.mensagem = mensagem
 	logger.log.
 		Warn().
 		Caller(1).
@@ -94,6 +98,7 @@ func (logger *LoggerType) Alerta(mensagem string, dados ...interface{}) {
 
 // Info: cria um log de informação
 func (logger *LoggerType) Info(mensagem string, dados ...interface{}) {
+	logger.mensagem = mensagem
 	logger.log.
 		Info().
 		Caller(1).
@@ -103,6 +108,7 @@ func (logger *LoggerType) Info(mensagem string, dados ...interface{}) {
 
 // Debug: cria um log de Debug
 func (logger *LoggerType) Debug(mensagem string, dados ...interface{}) {
+	logger.mensagem = mensagem
 	logger.log.
 		Debug().
 		Caller(1).
@@ -112,6 +118,7 @@ func (logger *LoggerType) Debug(mensagem string, dados ...interface{}) {
 
 // Rastreamento: cria um log de rastreamento
 func (logger *LoggerType) Rastreamento(mensagem string, dados ...interface{}) {
+	logger.mensagem = mensagem
 	logger.log.
 		Trace().
 		Caller(1).
@@ -132,4 +139,9 @@ func (logger *LoggerType) converterSliceDadosParaJsonString(dados ...interface{}
 		jsonString += dado
 	}
 	return
+}
+
+// converterSliceDadosParaJsonString: converte uma interface para jsonString
+func (logger *LoggerType) RetornarMensagem() string {
+	return logger.mensagem
 }
