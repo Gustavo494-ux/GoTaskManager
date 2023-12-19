@@ -12,10 +12,21 @@ import (
 // TestMain:Função executada antes das demais
 func TestMain(m *testing.M) {
 	inicializar.InicializarParaTestes()
-	os.Exit(m.Run())
+
+	exitCode := m.Run()
+
+	if exitCode == 0 {
+		logger.Logger().Info("Testes do pacote GerenciadordeJson executados com sucesso!")
+	} else {
+		logger.Logger().Alerta("Ocorreram erros ao executar os testes do pacote GerenciadordeJson")
+	}
+
+	os.Exit(exitCode)
 }
 
 func TestInterfaceParaJsonString(t *testing.T) {
+	t.Parallel()
+
 	type Pessoa struct {
 		Nome  string `json:"nome"`
 		Idade int    `json:"idade"`
@@ -24,34 +35,46 @@ func TestInterfaceParaJsonString(t *testing.T) {
 
 	jsonStr, err := GerenciadordeJson.InterfaceParaJsonString(p)
 	if err != nil {
-		t.Errorf("Erro ao converter interface{} para JSON: %v", err)
-		logger.Logger().Error("Erro ao converter interface{} para JSON", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao executar a função InterfaceParaJsonString", err)
+		t.FailNow()
 	}
 
 	expected := `{"nome":"João","idade":30}`
 	if jsonStr != expected {
-		t.Errorf("JSON esperado: %s, JSON retornado: %s", expected, jsonStr)
-		logger.Logger().Error(fmt.Sprintf("JSON esperado: %s, JSON retornado: %s", expected, jsonStr), err)
+		logger.Logger().Error("Teste "+t.Name()+":	A função InterfaceParaJsonString não retornou o valor esperado",
+			err,
+			fmt.Sprintf("JSON esperado: %s, JSON retornado: %s", expected, jsonStr),
+		)
+		t.FailNow()
 	}
-	logger.Logger().Info("Teste TestInterfaceParaJsonString executado com sucesso!")
+
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
 
 func TestJsonStringParaInterface(t *testing.T) {
+	t.Parallel()
+
 	jsonStr := `{"nome":"João","idade":30}`
 	expected := map[string]interface{}{
 		"nome":  "João",
 		"idade": float64(30),
 	}
+
 	jsonData, err := GerenciadordeJson.JsonStringParaInterface(jsonStr)
 	if err != nil {
-		t.Errorf("Erro ao converter JSON para interface{}: %v", err)
-		logger.Logger().Error("Erro ao converter JSON para interface{}", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao executar a função JsonStringParaInterface", err)
+		t.FailNow()
 	}
+
 	if !compareMaps(jsonData.(map[string]interface{}), expected) {
-		t.Errorf("Interface{} esperada: %v, Interface{} retornada: %v", expected, jsonData)
-		logger.Logger().Error(fmt.Sprintf("Interface{} esperada: %v, Interface{} retornada: %v", expected, jsonData), err)
+		logger.Logger().Error("Teste "+t.Name()+":	A função JsonStringParaInterface não retornou o valor esperado",
+			err,
+			fmt.Sprintf("JSON esperado: %s, JSON retornado: %s", expected, jsonStr),
+		)
+		t.FailNow()
 	}
-	logger.Logger().Info("Teste TestJsonStringParaInterface executado com sucesso!")
+
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
 
 func compareMaps(m1, m2 map[string]interface{}) bool {
