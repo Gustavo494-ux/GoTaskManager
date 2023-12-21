@@ -12,77 +12,93 @@ import (
 	"testing"
 )
 
-const (
-	fileName      = "testfile.txt"
-	directoryName = "directoryTest"
-)
-
 // TestMain:Função executada antes das demais
 func TestMain(m *testing.M) {
 	inicializar.InicializarParaTestes()
-	os.Exit(m.Run())
+
+	exitCode := m.Run()
+
+	if exitCode == 0 {
+		logger.Logger().Info("Testes do pacote manipuladorDeArquivos executados com sucesso!")
+	} else {
+		logger.Logger().Alerta("Ocorreram erros ao executar os testes do pacote manipuladorDeArquivos")
+	}
+
+	os.Exit(exitCode)
 }
 
-func TestCreateFile(t *testing.T) {
+func TestCriarArquivo(t *testing.T) {
+	fileName := t.Name()
+	t.Parallel()
 	dir, _ := os.Getwd()
 	_, err := manipuladorDeArquivos.CriarArquivo(dir, fileName)
 	if err != nil {
-		t.Errorf("Falha ao criar o arquivo: %s", err)
-		logger.Logger().Error("Falha ao criar o arquivo", err)
+		logger.Logger().Error("Teste: "+t.Name()+":	Ocorreu um erro ao  executar a função CriarArquivo", err)
+		t.FailNow()
 	}
 	os.Remove(fileName)
-	logger.Logger().Info("Teste TestCreateFile executado com sucesso!")
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
 
-func TestOpenFile(t *testing.T) {
+func TestAbrirArquivo(t *testing.T) {
+	t.Parallel()
+
+	fileName := t.Name()
+
 	dir, _ := os.Getwd()
 	expectedContent := "Conteúdo do arquivo de teste"
 	err := os.WriteFile(fileName, []byte(expectedContent), 0644)
 	if err != nil {
-		t.Fatalf("Falha ao escrever o arquivo de teste: %s", err)
-		logger.Logger().Error("Falha ao escrever o arquivo de teste", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao escrever o arquivo de teste", err)
+		t.FailNow()
 	}
 	defer os.Remove(fileName)
 
 	content, err := manipuladorDeArquivos.AbrirArquivo(dir, fileName)
 	if err != nil {
-		t.Errorf("Falha ao abrir o arquivo: %s", err)
-		logger.Logger().Error("Falha ao abrir o arquivo", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao abrir o arquivo de teste", err)
+		t.FailNow()
 	}
 
 	if content != expectedContent {
-		t.Errorf("OpenFile retornou conteúdo incorreto. Esperado: %s, Obtido: %s", expectedContent, content)
-		logger.Logger().Error(fmt.Sprintf("OpenFile retornou conteúdo incorreto. Esperado: %s, Obtido: %s", expectedContent, content), err)
+		logger.Logger().Alerta("Teste " + t.Name() + ":	A função AbrirArquivo não retornou o resultado esperado")
+		t.FailNow()
 	}
 
-	logger.Logger().Info("Teste TestOpenFile executado com sucesso!")
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
 
-func TestWriteFile(t *testing.T) {
+func TestEscreverArquivo(t *testing.T) {
+	fileName := t.Name()
+
+	t.Parallel()
 	dir, _ := os.Getwd()
 	content := "Conteúdo do arquivo de teste"
 	err := manipuladorDeArquivos.EscreverArquivo(dir, fileName, content)
 	if err != nil {
-		t.Errorf("Falha ao escrever no arquivo: %s", err)
-		logger.Logger().Error("Falha ao escrever no arquivo", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao executar a função EscreverArquivo", err)
+		t.FailNow()
 	}
 	defer os.Remove(fileName)
 
 	fileContent, err := os.ReadFile(fileName)
 	if err != nil {
-		t.Fatalf("Falha ao ler o arquivo de teste: %s", err)
-		logger.Logger().Error("Falha ao ler o arquivo de teste", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao ler o arquivo de teste", err)
+		t.FailNow()
 	}
 
 	if string(fileContent) != content {
-		t.Errorf("WriteFile não escreveu o conteúdo esperado. Esperado: %s, Obtido: %s", content, string(fileContent))
-		logger.Logger().Error(fmt.Sprintf("WriteFile não escreveu o conteúdo esperado. Esperado: %s, Obtido: %s", content, string(fileContent)), err)
+		logger.Logger().Alerta("Teste " + t.Name() + ":	A função EscreverArquivo não escreveu o conteúdo no arquivo")
+		t.FailNow()
 	}
 
-	logger.Logger().Info("Teste TestWriteFile executado com sucesso!")
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
 
-func TestAppendToFile(t *testing.T) {
+func TestAdicionarNoArquivo(t *testing.T) {
+	fileName := t.Name()
+
+	t.Parallel()
 	initialContent := "Conteúdo inicial"
 	appendedContent := "Conteúdo anexado"
 
@@ -92,57 +108,63 @@ func TestAppendToFile(t *testing.T) {
 
 	err := os.WriteFile(fullPath, []byte(initialContent), 0644)
 	if err != nil {
-		t.Fatalf("Falha ao escrever o arquivo de teste: %s", err)
-		logger.Logger().Error("Falha ao escrever o arquivo de teste", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao escrever o arquivo de teste", err)
+		t.FailNow()
 	}
 	defer os.Remove(fullPath)
 
 	err = manipuladorDeArquivos.AdicionarAoArquivo(directoryPath, fileName, appendedContent)
 	if err != nil {
-		t.Errorf("Falha ao anexar ao arquivo: %s", err)
-		logger.Logger().Error("Falha ao anexar ao arquivo", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao anexar ao arquivo teste", err)
+		t.FailNow()
 	}
 
 	fileContent, err := os.ReadFile(fullPath)
 	if err != nil {
-		t.Fatalf("Falha ao ler o arquivo de teste: %s", err)
-		logger.Logger().Error("Falha ao ler o arquivo de teste", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao ler o arquivo de teste", err)
+		t.FailNow()
 	}
 
 	expectedContent := initialContent + appendedContent
 	if string(fileContent) != expectedContent {
-		t.Errorf("AppendToFile não anexou o conteúdo esperado. Esperado: %s, Obtido: %s", expectedContent, string(fileContent))
-		logger.Logger().Error(fmt.Sprintf("AppendToFile não anexou o conteúdo esperado. Esperado: %s, Obtido: %s", expectedContent, string(fileContent)), err)
+		logger.Logger().Error("Teste "+t.Name()+":	A função AdicionarAoArquivo não anexou o conteúdo.", err)
+		t.FailNow()
 	}
 
-	logger.Logger().Info("Teste TestAppendToFile executado com sucesso!")
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
 
 func TestDeleteFile(t *testing.T) {
+	fileName := t.Name()
+
+	t.Parallel()
 	dir, _ := os.Getwd()
 	fullPath := filepath.Join(dir, fileName)
 	file, err := os.Create(fullPath)
 	if err != nil {
-		t.Errorf("Falha ao criar o arquivo: %s", err)
-		logger.Logger().Error("Falha ao criar o arquivo", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao criar o arquivo de teste", err)
+		t.FailNow()
 	}
 	file.Close()
 	err = manipuladorDeArquivos.ExcluirArquivo(dir, fileName)
 	if err != nil {
-		t.Errorf("Erro ao excluir o arquivo: %s", err)
-		logger.Logger().Error("Erro ao excluir o arquivo", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao executar a função ExcluirArquivo", err)
+		t.FailNow()
 	}
 
 	_, err = os.Stat(fileName)
 	if !os.IsNotExist(err) {
-		t.Errorf("DeleteFile não excluiu o arquivo como esperado")
-		logger.Logger().Error("DeleteFile não excluiu o arquivo como esperado", err)
+		logger.Logger().Error("Teste "+t.Name()+":	A função ExcluirArquivo não excluiu o arquivo", err)
+		t.FailNow()
 	}
 
-	logger.Logger().Info("Teste TestDeleteFile executado com sucesso!")
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
 
 func TestRenameFile(t *testing.T) {
+	fileName := t.Name()
+
+	t.Parallel()
 	dir, _ := os.Getwd()
 	newFileName := "newfile.txt"
 
@@ -151,46 +173,47 @@ func TestRenameFile(t *testing.T) {
 
 	err := os.WriteFile(fullPathInitial, []byte("Conteúdo do arquivo de teste"), 0644)
 	if err != nil {
-		t.Fatalf("Falha ao escrever o arquivo de teste: %s", err)
-		logger.Logger().Error("Falha ao escrever o arquivo de teste", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao escrever o arquivo de teste", err)
+		t.FailNow()
 	}
 	defer os.Remove(newFileName)
 
 	err = manipuladorDeArquivos.RenomearArquivo(dir, fileName, newFileName)
 	if err != nil {
-		t.Errorf("Falha ao renomear o arquivo: %s", err)
-		logger.Logger().Error("Falha ao renomear o arquivo", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao executar a função RenomearArquivo", err)
+		t.FailNow()
 	}
 
 	_, err = os.Stat(fullPathInitial)
 	if !os.IsNotExist(err) {
-		t.Errorf("RenameFile não renomeou o arquivo como esperado")
-		logger.Logger().Error("RenameFile não renomeou o arquivo como esperado", err)
+		logger.Logger().Error("Teste "+t.Name()+": Ocorreu um erro ao buscar as propriedades do arquivo", err)
+		t.FailNow()
 	}
 
 	_, err = os.Stat(fullPathRename)
 	if os.IsNotExist(err) {
-		t.Errorf("RenameFile não criou o arquivo renomeado como esperado")
-		logger.Logger().Error("RenameFile não criou o arquivo renomeado como esperado", err)
+		logger.Logger().Error("Teste "+t.Name()+": A função RenomearArquivo não renomeou o arquivo", err)
+		t.FailNow()
 	}
 
-	logger.Logger().Info("Teste TestRenameFile executado com sucesso!")
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
 
 func TestGetFileList(t *testing.T) {
+	t.Parallel()
 	// Criar um diretório temporário para fins de teste
 	currentDirectory, err := os.Getwd()
 	if err != nil {
-		t.Fatalf("Erro ao buscar o caminho do diretório atual, erro: %s", err)
-		logger.Logger().Error("Erro ao buscar o caminho do diretório atual, erro", err)
+		logger.Logger().Error("Teste "+t.Name()+": Ocorreu um erro ao buscar o caminho do diretório atual", err)
+		t.FailNow()
 	}
 
 	fullPath := strings.ReplaceAll(filepath.Join(currentDirectory, "test_directory"), "\\", "/")
 
 	err = os.MkdirAll(fullPath, 0750)
 	if err != nil {
-		t.Fatalf("Falha ao criar o diretório temporário: %v", err)
-		logger.Logger().Error("Falha ao criar o diretório temporário", err)
+		logger.Logger().Error("Teste "+t.Name()+": Ocorreu um erro ao criar o diretório temporario", err)
+		t.FailNow()
 	}
 	defer os.RemoveAll("test_directory")
 
@@ -200,8 +223,8 @@ func TestGetFileList(t *testing.T) {
 		filePath := filepath.Join(fullPath, filename)
 		file, err := os.Create(filePath)
 		if err != nil {
-			t.Fatalf("Falha ao criar o arquivo de teste: %v", err)
-			logger.Logger().Error("Falha ao criar o arquivo de teste", err)
+			logger.Logger().Error("Teste "+t.Name()+": Ocorreu um erro ao criar o arquivo de teste", err)
+			t.FailNow()
 		}
 		defer file.Close()
 	}
@@ -209,8 +232,8 @@ func TestGetFileList(t *testing.T) {
 	// Executar a função GetFileList no diretório de teste
 	fileList, err := manipuladorDeArquivos.ObterListaArquivos(fullPath)
 	if err != nil {
-		t.Fatalf("Erro ao obter a lista de arquivos: %v", err)
-		logger.Logger().Error("Erro ao obter a lista de arquivos", err)
+		logger.Logger().Error("Teste "+t.Name()+": Ocorreu um erro ao executar a função ObterListaArquivos", err)
+		t.FailNow()
 	}
 
 	// Verificar se todos os arquivos de teste estão presentes na lista de arquivos retornada
@@ -223,8 +246,8 @@ func TestGetFileList(t *testing.T) {
 			}
 		}
 		if !found {
-			t.Errorf("Arquivo esperado ausente na lista de arquivos retornada: %s", filename)
-			logger.Logger().Error("Arquivo esperado ausente na lista de arquivos retornada", err)
+			logger.Logger().Error("Teste "+t.Name()+": Arquivo esperado ausente na lista de arquivos retornada", err)
+			t.FailNow()
 		}
 	}
 
@@ -232,12 +255,16 @@ func TestGetFileList(t *testing.T) {
 	if len(fileList) != len(testFiles) {
 		t.Errorf("O número de arquivos retornados é diferente do esperado. Esperado: %d, Retornado: %d", len(testFiles), len(fileList))
 		logger.Logger().Error(fmt.Sprintf("O número de arquivos retornados é diferente do esperado. Esperado: %d, Retornado: %d", len(testFiles), len(fileList)), err)
+
+		logger.Logger().Alerta("Teste "+t.Name()+": O número de arquivos retornados é diferente do esperado. Esperado: %d, Retornado: %d", len(testFiles), len(fileList))
+		t.FailNow()
 	}
 
-	logger.Logger().Info("Teste TestGetFileList executado com sucesso!")
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
 
 func TestCreateDirectory(t *testing.T) {
+	t.Parallel()
 	// Especificar o caminho base para os novos diretórios
 	basePath := "./src/utility/teste"
 
@@ -252,35 +279,36 @@ func TestCreateDirectory(t *testing.T) {
 		// Chamar a função CreateDirectory
 		err := manipuladorDeArquivos.CriarDiretorio(caminho)
 		if err != nil {
-			t.Errorf("Falha ao criar o diretório: %v", err)
-			logger.Logger().Error("Falha ao criar o diretório", err)
+			logger.Logger().Error("Teste "+t.Name()+": Ocorreu um erro ao executar a função CriarDiretorio", err)
+			t.FailNow()
 		}
 	}
 
 	sliceBasePath := strings.Split(basePath, "/")
 	err := os.RemoveAll("./" + sliceBasePath[1])
 	if err != nil {
-		t.Errorf("Falha ao remover o diretório: %v", err)
-		logger.Logger().Error("Falha ao remover o diretório", err)
+		logger.Logger().Error("Teste "+t.Name()+": Ocorreu um erro ao remover os diretorios", err)
+		t.FailNow()
 	}
 
-	logger.Logger().Info("Teste TestCreateDirectory executado com sucesso!")
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
 
 func TestGetFileInfo(t *testing.T) {
+	t.Parallel()
 	// Teste para um arquivo
 	caminhoDoArquivo := "./src/utility/file.txt"
 	infoDoArquivo, err := manipuladorDeArquivos.ObterInformacoesArquivo(caminhoDoArquivo)
 	if err != nil {
-		t.Errorf("Falha ao obter informações do arquivo: %v", err)
-		logger.Logger().Error("Falha ao obter informações do arquivo", err)
+		logger.Logger().Error("Teste "+t.Name()+": Ocorreu um erro ao executar a função ObterInformacoesArquivo", err)
+		t.FailNow()
 	}
 
 	if infoDoArquivo != nil {
 		// Verificar se é um arquivo
 		if !infoDoArquivo.Mode().IsRegular() {
-			t.Errorf("Esperado um arquivo, obtido um diretório")
-			logger.Logger().Error("Esperado um arquivo, obtido um diretório", err)
+			logger.Logger().Error("Teste "+t.Name()+": Esperado um arquivo, obtido um diretório", err)
+			t.FailNow()
 		}
 	}
 
@@ -288,17 +316,17 @@ func TestGetFileInfo(t *testing.T) {
 	caminhoDoDiretório := "./src/utility"
 	infoDoDiretório, err := manipuladorDeArquivos.ObterInformacoesArquivo(caminhoDoDiretório)
 	if err != nil {
-		t.Errorf("Falha ao obter informações do diretório: %v", err)
-		logger.Logger().Error("Falha ao obter informações do diretório", err)
+		logger.Logger().Error("Teste "+t.Name()+": Ocorreu um erro ao executar a função ObterInformacoesArquivo", err)
+		t.FailNow()
 	}
 
 	if infoDoDiretório != nil {
 		// Verificar se é um diretório
 		if !infoDoDiretório.Mode().IsDir() {
-			t.Errorf("Esperado um diretório, obtido um arquivo")
-			logger.Logger().Error("Esperado um diretório, obtido um arquivo", err)
+			logger.Logger().Error("Teste "+t.Name()+": Esperado um diretório, obtido um arquivo", err)
+			t.FailNow()
 		}
 	}
 
-	logger.Logger().Info("Teste TestGetFileInfo executado com sucesso!")
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
 }
