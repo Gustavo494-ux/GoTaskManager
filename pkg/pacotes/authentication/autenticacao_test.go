@@ -1,12 +1,13 @@
-package authentication
+package authentication_test
 
 import (
 	"GoTaskManager/internal/app/inicializar"
+	"GoTaskManager/pkg/pacotes/authentication"
 	"GoTaskManager/pkg/pacotes/logger"
+	"encoding/json"
 	"net/http"
 	"os"
 	"reflect"
-	"strconv"
 	"testing"
 	"time"
 )
@@ -14,6 +15,9 @@ import (
 // TestMain:Função executada antes das demais
 func TestMain(m *testing.M) {
 	inicializar.InicializarParaTestes()
+
+	authentication.DefinirSecretKey("secrectKey")
+
 	exitCode := m.Run()
 	if exitCode == 0 {
 		logger.Logger().Info("Testes do pacote authentication executados com sucesso!")
@@ -25,7 +29,7 @@ func TestMain(m *testing.M) {
 
 func TestNovoToken(t *testing.T) {
 	t.Parallel()
-	tokenBuilder := NovoToken(true, time.Now().Add(time.Hour*6).Unix())
+	tokenBuilder := authentication.NovoToken(true, time.Now().Add(time.Hour*6).Unix())
 	if len(tokenBuilder.Claims) == 0 {
 		logger.Logger().Alerta("Teste: " + t.Name() + ":	a função NovoToken não retornou um TokenBuilder")
 		t.FailNow()
@@ -36,7 +40,7 @@ func TestNovoToken(t *testing.T) {
 func TestAdicionarParametro(t *testing.T) {
 	t.Parallel()
 
-	tokenBuilder := NovoToken(true, time.Now().Add(time.Hour*6).Unix())
+	tokenBuilder := authentication.NovoToken(true, time.Now().Add(time.Hour*6).Unix())
 	tokenBuilder.AdicionarParametro("usuarioId", 1)
 
 	if _, ok := tokenBuilder.Claims["usuarioId"]; !ok {
@@ -50,7 +54,7 @@ func TestAdicionarParametro(t *testing.T) {
 func TestCriar(t *testing.T) {
 	t.Parallel()
 	token, err :=
-		NovoToken(true, time.Now().Add(time.Hour*6).Unix()).
+		authentication.NovoToken(true, time.Now().Add(time.Hour*6).Unix()).
 			AdicionarParametro("usuarioId", 1).
 			Criar()
 
@@ -70,7 +74,7 @@ func TestCriar(t *testing.T) {
 func TestValidarToken(t *testing.T) {
 	t.Parallel()
 	token, err :=
-		NovoToken(true, time.Now().Add(time.Hour*6).Unix()).
+		authentication.NovoToken(true, time.Now().Add(time.Hour*6).Unix()).
 			AdicionarParametro("usuarioId", 1).
 			Criar()
 
@@ -87,7 +91,7 @@ func TestValidarToken(t *testing.T) {
 
 	req.Header.Set("Authorization", "Bearer "+token)
 
-	err = ValidarToken(*req)
+	err = authentication.ValidarToken(*req)
 	if err != nil {
 		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao executar a função ValidarToken", err)
 		t.FailNow()
@@ -98,23 +102,29 @@ func TestValidarToken(t *testing.T) {
 
 func TestExtrairInformacao(t *testing.T) {
 	t.Parallel()
-	token, _ := NovoToken(true, time.Now().Add(time.Hour*6).Unix()).
+	token, _ := authentication.NovoToken(true, time.Now().Add(time.Hour*6).Unix()).
 		AdicionarParametro("usuarioId", 1).
 		Criar()
 
-	usuarioIdString, err := ExtrairInformacao(token, "usuarioId")
+	usuarioIdInterface, err := authentication.ExtrairInformacao(token, "usuarioId")
 	if err != nil {
 		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao executar a função ExtrairInformacao", err)
 		t.FailNow()
 	}
 
-	usuarioId, err := strconv.Atoi(usuarioIdString)
+	usuarioIdJsonSaida, err := json.Marshal(usuarioIdInterface)
 	if err != nil {
-		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao converter o usuarioId de tipo string em int", err)
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao converter usuarioIdJsonSaida para json", err)
 		t.FailNow()
 	}
 
-	if !reflect.DeepEqual(usuarioId, 1) {
+	usuarioIdJsonEntrada, err := json.Marshal(1)
+	if err != nil {
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao converter usuarioIdJsonEntrada para json", err)
+		t.FailNow()
+	}
+
+	if string(usuarioIdJsonEntrada) != string(usuarioIdJsonSaida) {
 		logger.Logger().Alerta("Teste " + t.Name() + ":	A função extrairInformacao não retornou o valor esperado")
 		t.FailNow()
 	}
@@ -123,11 +133,11 @@ func TestExtrairInformacao(t *testing.T) {
 
 func TestExtrairTodasInformacoes(t *testing.T) {
 	t.Parallel()
-	tokenBuilder := NovoToken(true, time.Now().Add(time.Hour*6).Unix())
-	var parametrosEntrada = map[string]string{
-		"usuarioId":  "1",
-		"permissao1": "true",
-		"permissao2": "false",
+	tokenBuilder := authentication.NovoToken(true, time.Now().Add(time.Hour*6).Unix())
+	parametrosEntrada := map[string]interface{}{
+		"usuarioId":  1,
+		"permissao1": true,
+		"permissao2": false,
 		"tipo":       "teste",
 	}
 
@@ -141,14 +151,27 @@ func TestExtrairTodasInformacoes(t *testing.T) {
 		t.FailNow()
 	}
 
-	parametrosSaida, err := ExtrairTodasInformacoes(token)
+	parametrosSaida, err := authentication.ExtrairTodasInformacoes(token)
 	if err != nil {
 		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao executar a função ExtrairTodasInformacoes", err)
 		t.FailNow()
 	}
 
+	var entrada, saida []byte
 	for chave := range parametrosEntrada {
-		if parametrosEntrada[chave] != parametrosSaida[chave] {
+		entrada, err = json.Marshal(parametrosEntrada[chave])
+		if err != nil {
+			logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao converter parametrosEntrada[chave] para json, na chave "+chave, err)
+			t.FailNow()
+		}
+
+		saida, err = json.Marshal(parametrosSaida[chave])
+		if err != nil {
+			logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao converter parametrosSaida[chave] para json, na chave "+chave, err)
+			t.FailNow()
+		}
+
+		if string(entrada) != string(saida) {
 			logger.Logger().Alerta("Teste " + t.Name() + ":	A função ExtrairTodasInformacoes não retornou o valor esperado")
 			t.FailNow()
 		}
@@ -162,7 +185,7 @@ func TestExtrairToken(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/", nil)
 	req.Header.Set("Authorization", "Bearer abc123")
 
-	token := ExtrairToken(*req)
+	token := authentication.ExtrairToken(*req)
 
 	if token != "abc123" {
 		logger.Logger().Error("Teste "+t.Name()+":	A função ExtrairToken não retornou o valor esperado", nil)

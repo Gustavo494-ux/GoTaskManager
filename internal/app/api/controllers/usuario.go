@@ -1,14 +1,19 @@
 package controllers
 
 import (
+	"GoTaskManager/pkg/pacotes/authentication"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
 
 // CriarUsuario insere um usuário no banco de dados.
 func CriarUsuario(c echo.Context) error {
-	return c.JSON(http.StatusNotFound, "Rota em desenvolvimento")
+	token, _ := authentication.NovoToken(true, time.Now().Add(time.Second*10).Unix()).AdicionarParametro("Usuario", "Gustavo").Criar()
+	return c.JSON(http.StatusAccepted, token)
+
+	// return c.JSON(http.StatusNotFound, "Rota em desenvolvimento")
 }
 
 // BuscarUsuarioPorId encontra um usuário no banco de dados por ID.

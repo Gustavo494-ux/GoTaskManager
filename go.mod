@@ -6,7 +6,7 @@ require (
 	github.com/duaneking/coalesce v0.0.0-20221228221308-65b26e6ee26e
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sql-driver/mysql v1.7.1
-	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/lib/pq v1.2.0
@@ -15,7 +15,6 @@ require (
 )
 
 require (
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

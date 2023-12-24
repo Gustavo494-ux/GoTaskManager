@@ -51,6 +51,7 @@ func buscarPortaApi(caminhoArquivoConfiguracao string) {
 		PortaApi = portaApi
 	} else {
 		PortaApi = PortaApiPadrao
+		logger.Logger().Info("Api Startada na porta padrão com sucesso!")
 	}
-
+	logger.Logger().Info("Api Startada com sucesso!")
 }
