@@ -1,7 +1,6 @@
 package inicializar
 
 import (
-	"GoTaskManager/internal/app/api"
 	"GoTaskManager/pkg/routines/configuracoes"
 )
 
@@ -23,5 +22,5 @@ func InicializarLogger() {
 
 // InicializarAPI: realize toda a configuração necessaria para utilização da API
 func InicializarAPI() {
-	api.Configurar()
+	configuracoes.Configurar("\\internal\\app\\config\\api.yaml")
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-// GerarEcho: retorna uma instância de Echo configurada
+// GerarEcho: retorna uma instância de Echo configurada inclusive as rotas
 func GerarEcho() *echo.Echo {
 	e := echo.New()
 

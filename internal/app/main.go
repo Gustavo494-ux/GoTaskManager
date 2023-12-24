@@ -6,10 +6,9 @@ import (
 )
 
 func init() {
-	inicializar.Inicializar()
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
 func main() {
-
+	inicializar.Inicializar()
 }
