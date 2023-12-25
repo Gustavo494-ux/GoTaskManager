@@ -1,16 +1,30 @@
 package manipuladorDeArquivos
 
 import (
+	"GoTaskManager/pkg/pacotes/logger"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
+var (
+	DiretorioRaiz string
+)
+
+func DefinirDiretorioRaiz(diretorio string) {
+	DiretorioRaiz = diretorio
+}
+
+func RetornarDiretorioRaiz() string {
+	return DiretorioRaiz
+}
+
 // CriarArquivo cria um novo arquivo com o nome especificado no diretório fornecido.
 func CriarArquivo(caminhoDiretorio string, nomeArquivo string) (arquivo *os.File, err error) {
 	arquivo, err = os.Create(filepath.Join(FormatarCaminho(caminhoDiretorio), nomeArquivo))
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função CriarArquivo", err)
 		return nil, err
 	}
 	defer arquivo.Close()
@@ -21,6 +35,7 @@ func CriarArquivo(caminhoDiretorio string, nomeArquivo string) (arquivo *os.File
 func AbrirArquivo(caminhoDiretorio string, nomeArquivo string) (string, error) {
 	data, err := os.ReadFile(filepath.Join(FormatarCaminho(caminhoDiretorio), nomeArquivo))
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função AbrirArquivo", err)
 		return "", err
 	}
 	return string(data), nil
@@ -29,6 +44,9 @@ func AbrirArquivo(caminhoDiretorio string, nomeArquivo string) (string, error) {
 // CarregarArquivo abre um arquivo existente para leitura.
 func CarregarArquivo(nomeArquivo string) (file *os.File, err error) {
 	file, err = os.OpenFile(nomeArquivo, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função CarregarArquivo", err)
+	}
 	return
 }
 
@@ -36,6 +54,7 @@ func CarregarArquivo(nomeArquivo string) (file *os.File, err error) {
 func EscreverArquivo(caminhoDiretorio string, nomeArquivo string, conteudo string) error {
 	err := os.WriteFile(filepath.Join(FormatarCaminho(caminhoDiretorio), nomeArquivo), []byte(conteudo), 0600)
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função EscreverrArquivo", err)
 		return err
 	}
 	return nil
@@ -47,12 +66,14 @@ func AdicionarAoArquivo(caminhoDiretorio string, nomeArquivo string, conteudo st
 		FormatarCaminho(filepath.Join(caminhoDiretorio, nomeArquivo)),
 		os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função AdicionarAoArquivo", err)
 		return err
 	}
 	defer file.Close()
 
 	_, err = file.WriteString(conteudo)
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função AdicionarAoArquivo", err)
 		return err
 	}
 	return nil
@@ -62,6 +83,7 @@ func AdicionarAoArquivo(caminhoDiretorio string, nomeArquivo string, conteudo st
 func ExcluirArquivo(caminhoDiretorio string, nomeArquivo string) error {
 	err := os.Remove(filepath.Join(FormatarCaminho(caminhoDiretorio), nomeArquivo))
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função EscluirArquivo", err)
 		return err
 	}
 	return nil
@@ -71,6 +93,7 @@ func ExcluirArquivo(caminhoDiretorio string, nomeArquivo string) error {
 func RenomearArquivo(caminhoDiretorio string, nomeArquivoAntigo string, nomeArquivoNovo string) error {
 	err := os.Rename(filepath.Join(FormatarCaminho(caminhoDiretorio), nomeArquivoAntigo), filepath.Join(caminhoDiretorio, nomeArquivoNovo))
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função RenomearArquivo", err)
 		return err
 	}
 	return nil
@@ -82,6 +105,7 @@ func ObterListaArquivos(diretorio string) ([]string, error) {
 
 	files, err := os.ReadDir(diretorio)
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função ObterListaArquivos", err)
 		return nil, err
 	}
 
@@ -98,6 +122,7 @@ func ObterListaArquivos(diretorio string) ([]string, error) {
 func CriarDiretorio(caminho string) error {
 	err := os.MkdirAll(caminho, 0750)
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função CriarDiretorio", err)
 		return fmt.Errorf("erro ao criar o diretório: %v", err)
 	}
 	return nil
@@ -108,6 +133,7 @@ func ObterInformacoesArquivo(caminho string) (os.FileInfo, error) {
 	// Converte o caminho para um caminho absoluto se for relativo
 	caminhoAbs, err := filepath.Abs(caminho)
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função ObterInformacoesArquivo", err)
 		return nil, fmt.Errorf("erro ao resolver o caminho absoluto: %v", err)
 	}
 
@@ -117,12 +143,14 @@ func ObterInformacoesArquivo(caminho string) (os.FileInfo, error) {
 		if os.IsNotExist(err) {
 			return nil, nil // Retorna nil quando o diretório não é encontrado
 		}
+		logger.Logger().Error("Ocorreu um erro ao executar a função ObterInformacoesArquivo", err)
 		return nil, fmt.Errorf("erro ao obter as informações do arquivo: %v", err)
 	}
 
 	// Recupera as informações do arquivo
 	infoArquivo, err := os.Stat(caminhoAbs)
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função ObterInformacoesArquivo", err)
 		return nil, fmt.Errorf("erro ao obter as informações do arquivo: %v", err)
 	}
 
@@ -134,11 +162,13 @@ func CriarArquivoSeNaoExistir(caminho string) (err error) {
 	dir, nomeArquivo := filepath.Split(caminho)
 	infoArquivo, err := ObterInformacoesArquivo(caminho)
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função CriarArquivoSeNaoExistir", err)
 		err = fmt.Errorf("erro ao obter as informações do arquivo: %s", err)
 	}
 	if infoArquivo == nil {
 		_, err = CriarArquivo(dir, nomeArquivo)
 		if err != nil {
+			logger.Logger().Error("Ocorreu um erro ao executar a função CriarArquivoSeNaoExistir", err)
 			err = fmt.Errorf("erro ao criar o arquivo: %s", err)
 		}
 	}
@@ -163,12 +193,14 @@ func ObterCaminhoUltimoDiretorio(caminho string) string {
 func CriarDiretorioOuArquivoSeNaoExistir(caminho string) (err error) {
 	err = CriarDiretorio(ObterCaminhoUltimoDiretorio(caminho))
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função CriarDiretorioOuArquivoSeNaoExistir", err)
 		err = fmt.Errorf("erro CriarDiretorioSeNaoExistir : %s", err)
 		return
 	}
 
 	err = CriarArquivoSeNaoExistir(caminho)
 	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao executar a função CriarDiretorioOuArquivoSeNaoExistir", err)
 		err = fmt.Errorf("erro CriarArquivoSeNaoExistir : %s", err)
 		return
 	}
@@ -195,11 +227,6 @@ func ObterCaminhoAbsolutoOuConcatenadoComRaiz(caminho string) (string, error) {
 		return caminho, nil
 	}
 
-	DiretorioRaiz, err := BuscarDiretorioRootRepositorio()
-	if err != nil {
-		return "", err
-	}
-
 	// Obter o último diretório e nome do arquivo do caminho
 	dir, nomeArquivo := filepath.Split(caminho)
 	dir = strings.TrimSuffix(dir, string(filepath.Separator))
@@ -210,27 +237,90 @@ func ObterCaminhoAbsolutoOuConcatenadoComRaiz(caminho string) (string, error) {
 	return caminhoAbsoluto, nil
 }
 
-// BuscarDiretorioRootRepositorio: Retorna o caminho do diretorio onde se encontra o .git do projeto.
-func BuscarDiretorioRootRepositorio() (caminho string, err error) {
-	caminho, err = os.Getwd()
-	if err != nil {
-		return "", err
-	}
-
-	for {
-		if _, err := os.Stat(filepath.Join(caminho, ".git")); err == nil {
-			return caminho, nil
-		}
-
-		if caminho == filepath.Dir(caminho) {
-			return "", fmt.Errorf("não está em um repositório git")
-		}
-
-		caminho = filepath.Dir(caminho)
-	}
-}
-
 // FormatarCaminho: aplica um replace substituindo "\\" por "/"
 func FormatarCaminho(caminho string) string {
 	return strings.ReplaceAll(caminho, "\\", "/")
+}
+
+// // ObterDiretorioDoArquivo obtém o diretório do arquivo específico na hierarquia
+// func ObterDiretorioDoArquivo(caminho, arquivo string) (string, error) {
+// 	var diretorioEncontrado string
+
+// 	// Função de callback que será chamada para cada arquivo e diretório encontrado
+// 	for {
+// 		err := filepath.Walk(caminho, func(currentDir string, info os.FileInfo, err error) error {
+// 			currentDir = ObterCaminhoUltimoDiretorio(currentDir)
+// 			if err != nil {
+// 				logger.Logger().Error("Erro ao percorrer diretório", err)
+// 				return err
+// 			}
+
+// 			// Verifica se o arquivo está presente no diretório atual
+// 			filePath := filepath.Join(currentDir, arquivo)
+// 			_, err = os.Stat(filePath)
+// 			if err == nil {
+// 				// O arquivo foi encontrado, armazenamos o diretório atual
+// 				diretorioEncontrado = currentDir
+// 				return filepath.SkipDir // Pula a verificação em subdiretórios após encontrar o arquivo
+// 			}
+
+// 			return nil
+// 		})
+
+// 		if err != nil {
+// 			logger.Logger().Error("Erro ao percorrer diretórios", err)
+// 			return "", err
+// 		}
+
+// 		if diretorioEncontrado == "" {
+// 			return ObterDiretorioDoArquivo(ObterCaminhoUltimoDiretorio(caminho), arquivo)
+// 		} else {
+// 			break
+// 		}
+
+// 	}
+
+// 	if diretorioEncontrado == "" {
+// 		logger.Logger().Error("Arquivo não encontrado em nenhum diretório", nil)
+// 		return "", fmt.Errorf("arquivo '%s' não encontrado em nenhum diretório", arquivo)
+// 	}
+// 	return diretorioEncontrado, nil
+// }
+
+// ObterDiretorioDoArquivo otimiza a busca do diretório do arquivo na hierarquia
+func ObterDiretorioDoArquivo(caminho, arquivo string) (string, error) {
+	var diretorioEncontrado string
+	for {
+		err := filepath.Walk(caminho, func(currentDir string, info os.FileInfo, err error) error {
+			// currentDir = ObterCaminhoUltimoDiretorio(currentDir)
+			if err != nil {
+				logger.Logger().Error("Erro ao percorrer diretório", err)
+				return err
+			}
+
+			// Verifica se o arquivo está presente no diretório atual
+			filePath := filepath.Join(currentDir, arquivo)
+			_, err = os.Stat(filePath)
+			if err == nil {
+				// O arquivo foi encontrado, armazenamos o diretório atual
+				diretorioEncontrado = currentDir
+				return filepath.SkipDir // Pula a verificação em subdiretórios após encontrar o arquivo
+			}
+
+			return nil
+		})
+		if err != nil {
+			logger.Logger().Error("Erro ao percorrer diretórios", err)
+			return "", err
+		}
+
+		if diretorioEncontrado == "" {
+			return ObterDiretorioDoArquivo(ObterCaminhoUltimoDiretorio(caminho), arquivo)
+		} else {
+			break
+		}
+
+	}
+
+	return diretorioEncontrado, nil
 }

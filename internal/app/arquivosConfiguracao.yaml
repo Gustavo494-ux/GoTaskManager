@@ -1,0 +1,3 @@
+CaminhoArquivoLogger: "E:/Projetos/Back/go/src/GoTaskManager/internal/app/config/logger.yaml"
+CaminhoArquivoApi: "E:/Projetos/Back/go/src/GoTaskManager/internal/app/config/api.yaml"
+CaminhoAutenticacao: "E:/Projetos/Back/go/src/GoTaskManager/internal/app/config/autenticacao.yaml"

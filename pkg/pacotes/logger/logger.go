@@ -2,7 +2,10 @@ package logger
 
 import (
 	"GoTaskManager/pkg/pacotes/GerenciadordeJson"
-	"GoTaskManager/pkg/pacotes/manipuladorDeArquivos"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/rs/zerolog"
 )
@@ -18,6 +21,7 @@ var (
 	CaminhoArquivoLog string
 	DiretorioRoot     string
 	FormatoDataHora   string
+	DiretorioRaiz     string
 )
 
 const (
@@ -51,12 +55,12 @@ func (logger *LoggerType) configurarLog(nivelLog NivelLog) {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 
-	caminho, err := manipuladorDeArquivos.ObterCaminhoAbsolutoOuConcatenadoComRaiz(CaminhoArquivoLog)
+	caminho, err := ObterCaminhoAbsolutoOuConcatenadoComRaiz(CaminhoArquivoLog)
 	if err != nil {
 		Logger().Fatal("Ocorreu um erro ao montar o caminho do diretorio raiz", err, caminho)
 	}
 
-	arquivoLog, err := manipuladorDeArquivos.CarregarArquivo(caminho)
+	arquivoLog, err := CarregarArquivo(caminho)
 	if err != nil {
 		logger.Fatal("Erro ao carregar arquivo de log", err)
 	}
@@ -67,6 +71,7 @@ func (logger *LoggerType) configurarLog(nivelLog NivelLog) {
 // Fatal: cria um log de erro fatal
 func (logger *LoggerType) Fatal(mensagem string, err error, dados ...interface{}) {
 	logger.mensagem = mensagem
+	fmt.Println(mensagem)
 	logger.log.
 		Fatal().
 		Caller(1).
@@ -78,6 +83,7 @@ func (logger *LoggerType) Fatal(mensagem string, err error, dados ...interface{}
 // Error: cria um log de erro
 func (logger *LoggerType) Error(mensagem string, err error, dados ...interface{}) {
 	logger.mensagem = mensagem
+	fmt.Println(mensagem)
 	logger.log.
 		Error().
 		Caller(1).
@@ -89,6 +95,7 @@ func (logger *LoggerType) Error(mensagem string, err error, dados ...interface{}
 // Alerta: cria um log de Alerta
 func (logger *LoggerType) Alerta(mensagem string, dados ...interface{}) {
 	logger.mensagem = mensagem
+	fmt.Println(mensagem)
 	logger.log.
 		Warn().
 		Caller(1).
@@ -99,6 +106,7 @@ func (logger *LoggerType) Alerta(mensagem string, dados ...interface{}) {
 // Info: cria um log de informação
 func (logger *LoggerType) Info(mensagem string, dados ...interface{}) {
 	logger.mensagem = mensagem
+	fmt.Println(mensagem)
 	logger.log.
 		Info().
 		Caller(1).
@@ -109,6 +117,7 @@ func (logger *LoggerType) Info(mensagem string, dados ...interface{}) {
 // Debug: cria um log de Debug
 func (logger *LoggerType) Debug(mensagem string, dados ...interface{}) {
 	logger.mensagem = mensagem
+	fmt.Println(mensagem)
 	logger.log.
 		Debug().
 		Caller(1).
@@ -119,6 +128,7 @@ func (logger *LoggerType) Debug(mensagem string, dados ...interface{}) {
 // Rastreamento: cria um log de rastreamento
 func (logger *LoggerType) Rastreamento(mensagem string, dados ...interface{}) {
 	logger.mensagem = mensagem
+	fmt.Println(mensagem)
 	logger.log.
 		Trace().
 		Caller(1).
@@ -144,4 +154,27 @@ func (logger *LoggerType) converterSliceDadosParaJsonString(dados ...interface{}
 // converterSliceDadosParaJsonString: converte uma interface para jsonString
 func (logger *LoggerType) RetornarMensagem() string {
 	return logger.mensagem
+}
+
+// ObterCaminhoAbsolutoOuConcatenadoComRaiz retorna o caminho absoluto ou o ultimo diretorio raiz + ultimo diretorio do parametro caminho + nome do arquivo
+func ObterCaminhoAbsolutoOuConcatenadoComRaiz(caminho string) (string, error) {
+	caminho = filepath.FromSlash(caminho)
+	if filepath.IsAbs(caminho) {
+		return caminho, nil
+	}
+
+	// Obter o último diretório e nome do arquivo do caminho
+	dir, nomeArquivo := filepath.Split(caminho)
+	dir = strings.TrimSuffix(dir, string(filepath.Separator))
+	nomeArquivo = strings.TrimPrefix(nomeArquivo, string(filepath.Separator))
+
+	// Concatenar o último diretório e nome do arquivo com o caminho raiz
+	caminhoAbsoluto := filepath.Join(DiretorioRaiz, dir, nomeArquivo)
+	return caminhoAbsoluto, nil
+}
+
+// CarregarArquivo abre um arquivo existente para leitura.
+func CarregarArquivo(nomeArquivo string) (file *os.File, err error) {
+	file, err = os.OpenFile(nomeArquivo, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	return
 }

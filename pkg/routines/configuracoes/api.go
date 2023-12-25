@@ -18,14 +18,16 @@ var (
 )
 
 // Configurar: configura a API para utilização
-func Configurar(CaminhoRelativoArquivoConfiguracao string) {
+func ConfigurarApi(CaminhoRelativoArquivoConfiguracao string) {
 	caminhoArquivoConfiguracao := FormatarCaminhoArquivoConfiguracao(CaminhoRelativoArquivoConfiguracao)
 	configurarVariaveis(caminhoArquivoConfiguracao)
 
 	e := rotas.GerarEcho()
 
 	e.Server.WriteTimeout = 30 * time.Second
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", PortaApi)))
+	if err := e.Start(fmt.Sprintf(":%d", PortaApi)); err != nil {
+		logger.Logger().Fatal("Ocorreu um erro ao startar a api", err)
+	}
 }
 
 // configurarVariaveis: configura as variaveis da api
@@ -53,5 +55,4 @@ func buscarPortaApi(caminhoArquivoConfiguracao string) {
 		PortaApi = PortaApiPadrao
 		logger.Logger().Info("Api Startada na porta padrão com sucesso!")
 	}
-	logger.Logger().Info("Api Startada com sucesso!")
 }
