@@ -1,9 +1,8 @@
 package configuracoes
 
 import (
-	"GoTaskManager/pkg/pacotes/GerenciadorArquivosConfig"
 	"GoTaskManager/pkg/pacotes/authentication"
-	"log"
+	"os"
 )
 
 // ConfigurarAutenticacao: configura a autenticacao
@@ -19,10 +18,5 @@ func PreencherVariaveisAutenteicacao(caminhoArquivoConfiguracao string) {
 
 // buscarSecretKey: busca
 func buscarSecretKey(caminhoArquivoConfiguracao string) string {
-	secretKey, err := GerenciadorArquivosConfig.NovoArquivoConfig(caminhoArquivoConfiguracao).Ler().ObterValorParametro("CHAVE_SECRETA_JWT").String()
-	if err != nil {
-		log.Fatal("Ocorreu um erro ao buscar a SECRETA_JWT no arquivo de configuração de autenticação", err)
-	}
-
-	return secretKey
+	return os.Getenv("CHAVE_SECRETA_JWT")
 }

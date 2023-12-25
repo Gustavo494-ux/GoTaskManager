@@ -4,6 +4,7 @@ import (
 	"GoTaskManager/pkg/pacotes/logger"
 	"GoTaskManager/pkg/pacotes/manipuladorDeArquivos"
 	"log"
+	"os"
 	"path/filepath"
 )
 
@@ -12,22 +13,21 @@ const (
 )
 
 // ConfigurarLogger: configura o Log
-func ConfigurarLogger(CaminhoRelativoArquivoConfiguracao string) {
-	caminhoArquivoConfiguracao := FormatarCaminhoArquivoConfiguracao(CaminhoRelativoArquivoConfiguracao)
-	PreencherVariaveisLog(caminhoArquivoConfiguracao)
+func ConfigurarLogger(CaminhoArquivoLog string) {
+	caminhoFormatado := FormatarCaminhoArquivoConfiguracao(CaminhoArquivoLog)
+	PreencherVariaveisLog(caminhoFormatado)
 }
 
 // PreencherVariaveisLog: Carrega os dados nas váriaveis
-func PreencherVariaveisLog(caminhoArquivoConfiguracao string) {
-	logger.CaminhoArquivoLog = CriarArquivoLogSeNaoExistir(caminhoArquivoConfiguracao)
+func PreencherVariaveisLog(CaminhoArquivoLog string) {
+	logger.CaminhoArquivoLog = CriarArquivoLogSeNaoExistir(CaminhoArquivoLog)
 	logger.DiretorioRoot = diretorioRoot
-	logger.FormatoDataHora = BuscarParametroArquivoConfiguracao(caminhoArquivoConfiguracao, "FormatoDataHora")
+	logger.FormatoDataHora = os.Getenv("FormatoDataHora")
 }
 
 // ConfigurarCaminhoArquivoLog: cria o  arquivo de log caso não exista
-func CriarArquivoLogSeNaoExistir(caminhoArquivoConfiguracao string) string {
-	var caminhoArquivoLog, caminhoCompleto string
-	caminhoArquivoLog = BuscarParametroArquivoConfiguracao(caminhoArquivoConfiguracao, "CaminhoArquivoLog")
+func CriarArquivoLogSeNaoExistir(caminhoArquivoLog string) string {
+	var caminhoCompleto string
 	if len(caminhoArquivoLog) == 0 {
 		caminhoCompleto = filepath.Join(diretorioRoot, CaminhoRelativoPadraoArquivoLog)
 	} else {

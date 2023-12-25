@@ -2,9 +2,9 @@ package configuracoes
 
 import (
 	"GoTaskManager/internal/app/api/rotas"
-	"GoTaskManager/pkg/pacotes/GerenciadorArquivosConfig"
 	"GoTaskManager/pkg/pacotes/logger"
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 )
@@ -37,22 +37,11 @@ func configurarVariaveis(caminhoArquivoConfiguracao string) {
 
 // buscarPortaApi: busca a porta da API no arquivo de configuração
 func buscarPortaApi(caminhoArquivoConfiguracao string) {
-	parametro, err := GerenciadorArquivosConfig.NovoArquivoConfig(caminhoArquivoConfiguracao).Ler().ObterValorParametro("PortaApi").String()
+	porta, err := strconv.Atoi(os.Getenv("PortaApi"))
 	if err != nil {
-		logger.Logger().Error("Ocorreu um erro buscar a porta da api no arquivo de configuração da api", err)
 		PortaApi = PortaApiPadrao
-	}
-
-	portaApi, err := strconv.Atoi(parametro)
-	if err != nil {
-		logger.Logger().Error("Ocorreu um erro converter a porta da api recuperada do arquivo de configuração da api em int", err)
-		PortaApi = PortaApiPadrao
-	}
-
-	if portaApi > 0 {
-		PortaApi = portaApi
+		logger.Logger().Error("Ocorreu um erro ao converter a porta da api em string para int. Foi utilizada a porta padrão", err)
 	} else {
-		PortaApi = PortaApiPadrao
-		logger.Logger().Info("Api Startada na porta padrão com sucesso!")
+		PortaApi = porta
 	}
 }

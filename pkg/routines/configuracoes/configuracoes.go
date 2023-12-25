@@ -1,7 +1,6 @@
 package configuracoes
 
 import (
-	"GoTaskManager/pkg/pacotes/GerenciadorArquivosConfig"
 	"GoTaskManager/pkg/pacotes/manipuladorDeArquivos"
 	"log"
 )
@@ -33,20 +32,4 @@ func DefinirDiretorioRoot(diretorio string) {
 // RetornarDiretorioRoot: retorna o caminho do diretorio root
 func RetornarDiretorioRoot() string {
 	return diretorioRoot
-}
-
-// BuscarParametroArquivoConfiguracao: busca e retorna o parametro de configuração do arquivo yaml
-func BuscarParametroArquivoConfiguracao(caminhoArquivoConfiguracao string, chave string) string {
-	caminhoArquivoConfiguracao = FormatarCaminhoArquivoConfiguracao(caminhoArquivoConfiguracao)
-
-	parametroConfiguracao, err := GerenciadorArquivosConfig.NovoArquivoConfig(caminhoArquivoConfiguracao).
-		Ler().
-		ObterValorParametro(chave).
-		String()
-
-	if err != nil {
-		log.Fatal("Ocorreu um erro ao buscar o parametro de configuração "+chave, err)
-	}
-
-	return parametroConfiguracao
 }

@@ -3,19 +3,18 @@ package inicializar
 import (
 	"GoTaskManager/pkg/pacotes/manipuladorDeArquivos"
 	"GoTaskManager/pkg/routines/configuracoes"
-	"fmt"
 	"os"
 	"path/filepath"
 )
 
 var (
-	NomeArquivoConfiguracaoPrincipal    = "arquivosConfiguracao.yaml"
-	CaminhoArquivoConfiguracaoPrincipal string
+	nomeArquivoConfiguracao = ".env"
+	diretorioRaiz           string
 )
 
 func init() {
 	DefinirDiretorioRaiz()
-	CaminhoArquivoConfiguracaoPrincipal = filepath.Join(configuracoes.RetornarDiretorioRoot(), NomeArquivoConfiguracaoPrincipal)
+	InicializarDotEnv()
 }
 
 // Inicializar: realiza todas as configurações para a inicialização do projeto
@@ -26,7 +25,7 @@ func Inicializar() {
 
 // Carrega e define o diretorio raiz onde for necessario
 func DefinirDiretorioRaiz() {
-	diretorioRaiz := CarregarDiretorioRaiz()
+	diretorioRaiz = CarregarDiretorioRaiz()
 	configuracoes.DefinirDiretorioRoot(diretorioRaiz)
 	manipuladorDeArquivos.DefinirDiretorioRaiz(diretorioRaiz)
 }
@@ -38,19 +37,23 @@ func InicializarParaTestes() {
 
 // InicializarLogger: realize toda a configuração necessaria para utilização do logger
 func InicializarLogger() {
-	configuracoes.ConfigurarLogger(configuracoes.BuscarParametroArquivoConfiguracao(CaminhoArquivoConfiguracaoPrincipal, "CaminhoArquivoLogger"))
+	configuracoes.ConfigurarLogger(os.Getenv("CaminhoArquivoLogger"))
 }
 
 // InicializarAPI: realize toda a configuração necessaria para utilização da API
 func InicializarAPI() {
-	configuracoes.ConfigurarApi(configuracoes.BuscarParametroArquivoConfiguracao(CaminhoArquivoConfiguracaoPrincipal, "CaminhoArquivoApi"))
+	configuracoes.ConfigurarApi(os.Getenv("CaminhoArquivoApi"))
+}
+
+// InicializarAPI: realize toda a configuração necessaria para utilização do env
+func InicializarDotEnv() {
+	configuracoes.ConfigurarEnv(filepath.Join(diretorioRaiz, "/", nomeArquivoConfiguracao))
 }
 
 // CarregarDiretorioRaiz: define o diretorio no qual o executavel está
 func CarregarDiretorioRaiz() string {
 	caminhoArquivo, _ := os.Getwd()
-	caminhoArquivo, _ = manipuladorDeArquivos.ObterDiretorioDoArquivo(caminhoArquivo, NomeArquivoConfiguracaoPrincipal)
-	fmt.Println(caminhoArquivo)
+	caminhoArquivo, _ = manipuladorDeArquivos.ObterDiretorioDoArquivo(caminhoArquivo, nomeArquivoConfiguracao)
 
 	return caminhoArquivo
 }

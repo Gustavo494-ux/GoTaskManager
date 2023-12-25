@@ -242,51 +242,6 @@ func FormatarCaminho(caminho string) string {
 	return strings.ReplaceAll(caminho, "\\", "/")
 }
 
-// // ObterDiretorioDoArquivo obtém o diretório do arquivo específico na hierarquia
-// func ObterDiretorioDoArquivo(caminho, arquivo string) (string, error) {
-// 	var diretorioEncontrado string
-
-// 	// Função de callback que será chamada para cada arquivo e diretório encontrado
-// 	for {
-// 		err := filepath.Walk(caminho, func(currentDir string, info os.FileInfo, err error) error {
-// 			currentDir = ObterCaminhoUltimoDiretorio(currentDir)
-// 			if err != nil {
-// 				logger.Logger().Error("Erro ao percorrer diretório", err)
-// 				return err
-// 			}
-
-// 			// Verifica se o arquivo está presente no diretório atual
-// 			filePath := filepath.Join(currentDir, arquivo)
-// 			_, err = os.Stat(filePath)
-// 			if err == nil {
-// 				// O arquivo foi encontrado, armazenamos o diretório atual
-// 				diretorioEncontrado = currentDir
-// 				return filepath.SkipDir // Pula a verificação em subdiretórios após encontrar o arquivo
-// 			}
-
-// 			return nil
-// 		})
-
-// 		if err != nil {
-// 			logger.Logger().Error("Erro ao percorrer diretórios", err)
-// 			return "", err
-// 		}
-
-// 		if diretorioEncontrado == "" {
-// 			return ObterDiretorioDoArquivo(ObterCaminhoUltimoDiretorio(caminho), arquivo)
-// 		} else {
-// 			break
-// 		}
-
-// 	}
-
-// 	if diretorioEncontrado == "" {
-// 		logger.Logger().Error("Arquivo não encontrado em nenhum diretório", nil)
-// 		return "", fmt.Errorf("arquivo '%s' não encontrado em nenhum diretório", arquivo)
-// 	}
-// 	return diretorioEncontrado, nil
-// }
-
 // ObterDiretorioDoArquivo otimiza a busca do diretório do arquivo na hierarquia
 func ObterDiretorioDoArquivo(caminho, arquivo string) (string, error) {
 	var diretorioEncontrado string

@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  app:
+    build:
+      # context: ./internal/build/docker/app.dockerfile
+      dockerfile: ./internal/build/docker/app.dockerfile
+    # Outras configurações do serviço, se necessário
+    # env_file:
+    #   - internal/app/config/api.yaml
+    # ports:
+    #   - ${PortaApi}:${PortaApi}
