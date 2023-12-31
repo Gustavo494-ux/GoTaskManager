@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	nomeArquivoConfiguracao = ".env"
+	nomeArquivoConfiguracao = "app.env"
 	diretorioRaiz           string
 )
 
