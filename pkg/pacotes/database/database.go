@@ -1,32 +1,25 @@
 package database
 
-import (
-	"GoTaskManager/pkg/pacotes/logger"
-
-	"github.com/jmoiron/sqlx"
-
-	_ "github.com/go-redis/redis"
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/lib/pq"
-)
-
-var (
-	DriverName    string
-	StringConexao string
-)
-
-func ConfigurarConexao(nomeDriver, stringConexao string) {
-	DriverName = nomeDriver
-	StringConexao = stringConexao
+type configuracaoBancoDeDados struct {
+	StringConexao    string
+	Host             string
+	NomeBancoDeDados string
+	Usuario          string
+	Senha            string
+	NomeDoDriver     string
+	SSLMode          string
+	Porta            int
 }
 
-// Conectar: Conecta ao banco de dados
-func Conectar() (db *sqlx.DB, err error) {
-	db, err = sqlx.Open(DriverName, StringConexao)
-	if err != nil {
-		logger.Logger().Error("Ocorreu um erro ao conectar com o banco de dados", err, StringConexao)
+// Novo: retorna uma nova instância de configuracaoBancoDeDados
+func Novo(host, nomeBanco, usuario, senha, nomeDoDriver, sslmode string, porta int) *configuracaoBancoDeDados {
+	return &configuracaoBancoDeDados{
+		Host:             host,
+		NomeBancoDeDados: nomeBanco,
+		Usuario:          usuario,
+		Senha:            senha,
+		NomeDoDriver:     nomeDoDriver,
+		SSLMode:          sslmode,
+		Porta:            porta,
 	}
-
-	logger.Logger().Rastreamento("Conexão com o banco de dados estabelecida com sucesso")
-	return
 }
