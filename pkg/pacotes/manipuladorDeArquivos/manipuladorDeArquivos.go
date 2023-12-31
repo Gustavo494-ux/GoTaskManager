@@ -234,7 +234,7 @@ func ObterCaminhoAbsolutoOuConcatenadoComRaiz(caminho string) (string, error) {
 
 	// Concatenar o último diretório e nome do arquivo com o caminho raiz
 	caminhoAbsoluto := filepath.Join(DiretorioRaiz, dir, nomeArquivo)
-	return caminhoAbsoluto, nil
+	return FormatarCaminho(caminhoAbsoluto), nil
 }
 
 // FormatarCaminho: aplica um replace substituindo "\\" por "/"

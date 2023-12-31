@@ -19,7 +19,7 @@ var (
 
 // Configurar: configura a API para utilização
 func ConfigurarApi(CaminhoRelativoArquivoConfiguracao string) {
-	caminhoArquivoConfiguracao := FormatarCaminhoArquivoConfiguracao(CaminhoRelativoArquivoConfiguracao)
+	caminhoArquivoConfiguracao := PrepararCaminhoArquivo(CaminhoRelativoArquivoConfiguracao)
 	configurarVariaveis(caminhoArquivoConfiguracao)
 
 	e := rotas.GerarEcho()

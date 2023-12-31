@@ -13,15 +13,13 @@ func init() {
 
 }
 
-// FormatarCaminhoArquivoConfiguracao: retorna o caminho absoluto do arquivo de configurações
-func FormatarCaminhoArquivoConfiguracao(caminhoRelativoArquivoConfiguracao string) string {
-	caminhoArquivoConfiguracao, err := manipuladorDeArquivos.ObterCaminhoAbsolutoOuConcatenadoComRaiz(caminhoRelativoArquivoConfiguracao)
-
+// PrepararCaminhoArquivo: retorna o caminho absoluto do arquivo de configurações
+func PrepararCaminhoArquivo(caminho string) (caminhoArquivoConfiguracao string) {
+	caminhoArquivoConfiguracao, err := manipuladorDeArquivos.ObterCaminhoAbsolutoOuConcatenadoComRaiz(caminho)
 	if err != nil {
-		log.Fatal("Ocorreu um erro ao buscar o CaminhoArquivoConfiguracao", err)
+		log.Fatal("Ocorreu um erro ao preparar o caminho do arquivo "+caminho, err)
 	}
-
-	return manipuladorDeArquivos.FormatarCaminho(caminhoArquivoConfiguracao)
+	return
 }
 
 // DefinirDiretorioRoot: Define o caminho do diretorio root

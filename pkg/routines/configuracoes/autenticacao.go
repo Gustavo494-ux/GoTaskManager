@@ -7,7 +7,7 @@ import (
 
 // ConfigurarAutenticacao: configura a autenticacao
 func ConfigurarAutenticacao(CaminhoRelativoArquivoConfiguracao string) {
-	caminhoArquivoConfiguracao := FormatarCaminhoArquivoConfiguracao(CaminhoRelativoArquivoConfiguracao)
+	caminhoArquivoConfiguracao := PrepararCaminhoArquivo(CaminhoRelativoArquivoConfiguracao)
 	PreencherVariaveisAutenteicacao(caminhoArquivoConfiguracao)
 }
 

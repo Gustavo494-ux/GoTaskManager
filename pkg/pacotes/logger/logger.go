@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/labstack/gommon/log"
 	"github.com/rs/zerolog"
 )
 
@@ -57,12 +58,12 @@ func (logger *LoggerType) configurarLog(nivelLog NivelLog) {
 
 	caminho, err := ObterCaminhoAbsolutoOuConcatenadoComRaiz(CaminhoArquivoLog)
 	if err != nil {
-		Logger().Fatal("Ocorreu um erro ao montar o caminho do diretorio raiz", err, caminho)
+		log.Fatal("Ocorreu um erro ao montar o caminho do diretorio raiz", err, caminho)
 	}
 
 	arquivoLog, err := CarregarArquivo(caminho)
 	if err != nil {
-		logger.Fatal("Erro ao carregar arquivo de log", err)
+		log.Fatal("Erro ao carregar arquivo de log", err)
 	}
 
 	logger.log = zerolog.New(arquivoLog).With().Timestamp().Logger()
@@ -139,11 +140,11 @@ func (logger *LoggerType) Rastreamento(mensagem string, dados ...interface{}) {
 // converterSliceDadosParaJsonString: converte uma interface para jsonString
 func (logger *LoggerType) converterSliceDadosParaJsonString(dados ...interface{}) (jsonString string) {
 	var dado string
-	var erroLocal error
+	var err error
 	for _, Valor := range dados {
-		dado, erroLocal = GerenciadordeJson.InterfaceParaJsonString(Valor)
-		if erroLocal != nil {
-			logger.Error("Ocorreu um erro ao converter uma interface para json string", erroLocal)
+		dado, err = GerenciadordeJson.InterfaceParaJsonString(Valor)
+		if err != nil {
+			log.Error(err)
 			return
 		}
 		jsonString += dado
@@ -173,8 +174,16 @@ func ObterCaminhoAbsolutoOuConcatenadoComRaiz(caminho string) (string, error) {
 	return caminhoAbsoluto, nil
 }
 
-// CarregarArquivo abre um arquivo existente para leitura.
-func CarregarArquivo(nomeArquivo string) (file *os.File, err error) {
-	file, err = os.OpenFile(nomeArquivo, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	return
+// CarregarArquivo abre um arquivo existente para leitura e adição de logs
+func CarregarArquivo(caminho string) (file *os.File, err error) {
+	if err = os.MkdirAll(strings.ReplaceAll(filepath.Dir(caminho), "\\", "/"), os.ModePerm); err != nil {
+		return
+	}
+
+	arquivo, err := os.OpenFile(caminho, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	return arquivo, nil
 }

@@ -21,3 +21,4 @@
 go.work
 *.log
 internal/build/buildTeste.bat
+internal/app/__debug*
