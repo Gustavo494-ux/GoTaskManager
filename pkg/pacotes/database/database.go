@@ -1,6 +1,6 @@
 package database
 
-type configuracaoBancoDeDados struct {
+type ConfiguracaoBancoDeDados struct {
 	StringConexao    string
 	Host             string
 	NomeBancoDeDados string
@@ -12,8 +12,8 @@ type configuracaoBancoDeDados struct {
 }
 
 // Novo: retorna uma nova instância de configuracaoBancoDeDados
-func Novo(host, nomeBanco, usuario, senha, nomeDoDriver, sslmode string, porta int) *configuracaoBancoDeDados {
-	return &configuracaoBancoDeDados{
+func Novo(host, nomeBanco, usuario, senha, nomeDoDriver, sslmode string, porta int) *ConfiguracaoBancoDeDados {
+	return &ConfiguracaoBancoDeDados{
 		Host:             host,
 		NomeBancoDeDados: nomeBanco,
 		Usuario:          usuario,

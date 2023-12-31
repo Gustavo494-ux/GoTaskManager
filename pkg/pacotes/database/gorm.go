@@ -7,7 +7,7 @@ import (
 )
 
 // ConectarSQLX: Conecta ao banco de dados utilizando o ORM GORM
-func (c *configuracaoBancoDeDados) ConectarGorm() (db *gorm.DB) {
+func (c *ConfiguracaoBancoDeDados) ConectarGorm() (db *gorm.DB) {
 	conexaoConfigurada := c.configurarConexaoGORM()
 
 	db, err := gorm.Open(conexaoConfigurada, &gorm.Config{})
@@ -20,7 +20,7 @@ func (c *configuracaoBancoDeDados) ConectarGorm() (db *gorm.DB) {
 }
 
 // configurarConexaoGORM: configurarConexaoGORM configura a conexão do banco de dados de acordo com o banco de dados passado no NomeDoDriver
-func (c *configuracaoBancoDeDados) configurarConexaoGORM() (conexao gorm.Dialector) {
+func (c *ConfiguracaoBancoDeDados) configurarConexaoGORM() (conexao gorm.Dialector) {
 	switch c.NomeDoDriver {
 	case "postgres":
 		conexao = c.configurarConexaoPostgresGORM()

@@ -8,7 +8,7 @@ import (
 )
 
 // ConectarSQLX: Conecta ao banco de dados utilizando o pacote SQLX
-func (c *configuracaoBancoDeDados) ConectarSQLX() (db *sqlx.DB, err error) {
+func (c *ConfiguracaoBancoDeDados) ConectarSQLX() (db *sqlx.DB, err error) {
 	c.configurarStringConexaoSQLX()
 
 	db, err = sqlx.Open(c.NomeDoDriver, c.StringConexao)
@@ -21,7 +21,7 @@ func (c *configuracaoBancoDeDados) ConectarSQLX() (db *sqlx.DB, err error) {
 }
 
 // configurarStringConexaoSQLX: configurarStringSQLX configura a string de conexão de acordo com o driver do banco
-func (c *configuracaoBancoDeDados) configurarStringConexaoSQLX() {
+func (c *ConfiguracaoBancoDeDados) configurarStringConexaoSQLX() {
 	switch c.NomeDoDriver {
 	case "mysql":
 		c.setarStringConexaoMysql()
