@@ -3,7 +3,7 @@
 # Use a imagem base desejada
 FROM golang:latest
 
-ENV APP_DIR=/go/src/usr/src/app/GoTaskManager/
+ENV APP_DIR=/go/src/usr/app/GoTaskManager/
 
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR "$APP_DIR"
@@ -16,16 +16,13 @@ RUN go mod download && go mod verify
 
 COPY . ./
 
-
-# Build do aplicativo
 # Baixar as dependências
 RUN go get -d -v ./...
 
 # Build do projeto
-# RUN go install -v ./...
-# RUN export PATH=$PATH:$(go env GOPATH)/bin
+RUN cd ./internal/app/ && go build -o aplicativo .
 
-RUN cd ./internal/app/ && go build .
+VOLUME "$APP_DIR"
 
 # Comando para executar o aplicativo quando o contêiner for iniciado
-CMD ["./internal/app/app"]
+CMD ["./internal/app/aplicativo"]
