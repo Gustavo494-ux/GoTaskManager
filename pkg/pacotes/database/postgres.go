@@ -9,8 +9,7 @@ import (
 
 // setarStringConexaoPostgres: setarStringConexaoPostgres configura a string de conexão do postgres
 func (c *ConfiguracaoBancoDeDados) setarStringConexaoPostgres() {
-
-	c.StringConexao = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%ds sslmode=%s",
+	c.StringConexao = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
 		c.Host,
 		c.Usuario,
 		c.Senha,

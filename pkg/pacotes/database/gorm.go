@@ -15,7 +15,7 @@ func (c *ConfiguracaoBancoDeDados) ConectarGorm() (db *gorm.DB) {
 		logger.Logger().Fatal("Ocorreu um erro ao conectar com o banco de dados utilizando GORM", err, c.StringConexao)
 
 	}
-	logger.Logger().Rastreamento("Conexão com o banco de dados estabelecida com sucesso utilizando GORM")
+	logger.Logger().Info("Conexão com o banco de dados estabelecida com sucesso utilizando GORM")
 	return
 }
 
@@ -24,7 +24,8 @@ func (c *ConfiguracaoBancoDeDados) configurarConexaoGORM() (conexao gorm.Dialect
 	switch c.NomeDoDriver {
 	case "postgres":
 		conexao = c.configurarConexaoPostgresGORM()
+	default:
+		logger.Logger().Fatal("Nenhuma configuração de banco de dados encontrada para "+c.NomeDoDriver, nil)
 	}
-	logger.Logger().Fatal("Nenhuma configuração de banco de dados encontrada para "+c.NomeDoDriver, nil)
 	return
 }

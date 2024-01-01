@@ -5,6 +5,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 // ConectarSQLX: Conecta ao banco de dados utilizando o pacote SQLX
@@ -16,11 +17,7 @@ func (c *ConfiguracaoBancoDeDados) ConectarSQLX() (db *sqlx.DB) {
 		logger.Logger().Fatal("Ocorreu um erro ao conectar com o banco de dados utilizando SQLX", err, c.StringConexao)
 	}
 
-	if err := db.Ping(); err != nil {
-		logger.Logger().Fatal("Ocorreu um erro realizar o ping no banco de dados utilizando SQLX", err, c.StringConexao)
-	}
-
-	logger.Logger().Rastreamento("Conexão com o banco de dados estabelecida com sucesso utilizando SQLX")
+	logger.Logger().Info("Conexão com o banco de dados estabelecida com sucesso utilizando SQLX")
 	return
 }
 
@@ -29,5 +26,7 @@ func (c *ConfiguracaoBancoDeDados) configurarStringConexaoSQLX() {
 	switch c.NomeDoDriver {
 	case "mysql":
 		c.setarStringConexaoMysql()
+	case "postgres":
+		c.setarStringConexaoPostgres()
 	}
 }
