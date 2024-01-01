@@ -12,7 +12,7 @@ func (c *ConfiguracaoBancoDeDados) ConectarGorm() (db *gorm.DB) {
 
 	db, err := gorm.Open(conexaoConfigurada, &gorm.Config{})
 	if err != nil {
-		logger.Logger().Error("Ocorreu um erro ao conectar com o banco de dados utilizando GORM", err, c.StringConexao)
+		logger.Logger().Fatal("Ocorreu um erro ao conectar com o banco de dados utilizando GORM", err, c.StringConexao)
 
 	}
 	logger.Logger().Rastreamento("Conexão com o banco de dados estabelecida com sucesso utilizando GORM")

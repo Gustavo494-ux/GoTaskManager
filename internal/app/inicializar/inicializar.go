@@ -1,10 +1,12 @@
 package inicializar
 
 import (
+	"GoTaskManager/pkg/pacotes/logger"
 	"GoTaskManager/pkg/pacotes/manipuladorDeArquivos"
 	"GoTaskManager/pkg/routines/configuracoes"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 var (
@@ -20,6 +22,7 @@ func init() {
 // Inicializar: realiza todas as configurações para a inicialização do projeto
 func Inicializar() {
 	InicializarLogger()
+	InicializarBancoDeDadosPrincipal()
 	InicializarAPI()
 }
 
@@ -33,6 +36,7 @@ func DefinirDiretorioRaiz() {
 // InicializarParaTestes: realiza configurações para execução dos testes
 func InicializarParaTestes() {
 	InicializarLogger()
+	InicializarBancoDeDadosTeste()
 }
 
 // InicializarLogger: realize toda a configuração necessaria para utilização do logger
@@ -56,4 +60,40 @@ func CarregarDiretorioRaiz() string {
 	caminhoArquivo, _ = manipuladorDeArquivos.ObterDiretorioDoArquivo(caminhoArquivo, nomeArquivoConfiguracao)
 
 	return caminhoArquivo
+}
+
+// InicializarBancoDeDadosPrincipal: inicializa o banco de dados para uso
+func InicializarBancoDeDadosPrincipal() {
+	porta, err := strconv.Atoi(os.Getenv("PORTA_DATABASE"))
+	if err != nil {
+		logger.Logger().Error("Ocorreu um erro ao converter a PORTA_DATABASE para string", err)
+	}
+
+	configuracoes.BancoProducao = configuracoes.ConfigurarNovoBanco(
+		os.Getenv("HOST_DATABASE"),
+		os.Getenv("NOME_DATABASE"),
+		os.Getenv("USUARIO_DATABASE"),
+		os.Getenv("SENHA_DATABASE"),
+		os.Getenv("NOME_DRIVER_DATABASE"),
+		os.Getenv("SSLMODE_DATABASE"),
+		porta,
+	)
+}
+
+// InicializarBancoDeDadosTeste: inicializa o banco de dados para uso dos testes
+func InicializarBancoDeDadosTeste() {
+	porta, err := strconv.Atoi(os.Getenv("PORTA_DATABASE_TESTE"))
+	if err != nil {
+		logger.Logger().Fatal("Ocorreu um erro ao converter a PORTA_DATABASE_TESTE para string", err)
+	}
+
+	configuracoes.BancoProducao = configuracoes.ConfigurarNovoBanco(
+		os.Getenv("HOST_DATABASE_TESTE "),
+		os.Getenv("NOME_DATABASE_TESTE "),
+		os.Getenv("USUARIO_DATABASE_TESTE "),
+		os.Getenv("SENHA_DATABASE_TESTE "),
+		os.Getenv("NOME_DRIVER_DATABASE_TESTE "),
+		os.Getenv("SSLMODE_DATABASE_TESTE "),
+		porta,
+	)
 }
