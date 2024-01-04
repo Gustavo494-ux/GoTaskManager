@@ -2,7 +2,6 @@ package rotas
 
 import (
 	"GoTaskManager/internal/app/api/middlewares"
-	"GoTaskManager/internal/app/api/rotas/rotas"
 	"net/http"
 	"time"
 
@@ -40,5 +39,5 @@ func configurarRotas(e *echo.Echo) {
 		return c.String(http.StatusOK, time.Now().Format(time.RFC3339Nano))
 	})
 
-	rotas.RotasUsuario(e)
+	RotasUsuario(e)
 }
