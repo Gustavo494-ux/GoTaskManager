@@ -14,8 +14,9 @@ import (
 type NivelLog zerolog.Level
 
 type LoggerType struct {
-	log      zerolog.Logger
-	mensagem string
+	log             zerolog.Logger
+	mensagem        string
+	SalvarEmArquivo bool
 }
 
 var (
@@ -58,12 +59,14 @@ func (logger *LoggerType) configurarLog(nivelLog NivelLog) {
 
 	caminho, err := ObterCaminhoAbsolutoOuConcatenadoComRaiz(CaminhoArquivoLog)
 	if err != nil {
-		log.Fatal("Ocorreu um erro ao montar o caminho do diretorio raiz", err, caminho)
+		log.Error("Ocorreu um erro ao montar o caminho do diretorio raiz", err, caminho)
 	}
 
 	arquivoLog, err := CarregarArquivo(caminho)
 	if err != nil {
-		log.Fatal("Erro ao carregar arquivo de log", err)
+		log.Error("Erro ao carregar arquivo de log", err)
+	} else {
+		logger.SalvarEmArquivo = true
 	}
 
 	logger.log = zerolog.New(arquivoLog).With().Timestamp().Logger()
@@ -73,68 +76,81 @@ func (logger *LoggerType) configurarLog(nivelLog NivelLog) {
 func (logger *LoggerType) Fatal(mensagem string, err error, dados ...interface{}) {
 	logger.mensagem = mensagem
 	fmt.Println(mensagem)
-	logger.log.
-		Fatal().
-		Caller(1).
-		Err(err).
-		Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
-		Msg(mensagem)
+
+	if logger.SalvarEmArquivo {
+		logger.log.
+			Fatal().
+			Caller(1).
+			Err(err).
+			Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
+			Msg(mensagem)
+	}
 }
 
 // Error: cria um log de erro
 func (logger *LoggerType) Error(mensagem string, err error, dados ...interface{}) {
 	logger.mensagem = mensagem
 	fmt.Println(mensagem)
-	logger.log.
-		Error().
-		Caller(1).
-		Err(err).
-		Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
-		Msg(mensagem)
+	if logger.SalvarEmArquivo {
+		logger.log.
+			Error().
+			Caller(1).
+			Err(err).
+			Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
+			Msg(mensagem)
+	}
 }
 
 // Alerta: cria um log de Alerta
 func (logger *LoggerType) Alerta(mensagem string, dados ...interface{}) {
-	logger.mensagem = mensagem
-	fmt.Println(mensagem)
-	logger.log.
-		Warn().
-		Caller(1).
-		Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
-		Msg(mensagem)
+	if logger.SalvarEmArquivo {
+		logger.mensagem = mensagem
+		fmt.Println(mensagem)
+		logger.log.
+			Warn().
+			Caller(1).
+			Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
+			Msg(mensagem)
+	}
 }
 
 // Info: cria um log de informação
 func (logger *LoggerType) Info(mensagem string, dados ...interface{}) {
 	logger.mensagem = mensagem
 	fmt.Println(mensagem)
-	logger.log.
-		Info().
-		Caller(1).
-		Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
-		Msg(mensagem)
+	if logger.SalvarEmArquivo {
+		logger.log.
+			Info().
+			Caller(1).
+			Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
+			Msg(mensagem)
+	}
 }
 
 // Debug: cria um log de Debug
 func (logger *LoggerType) Debug(mensagem string, dados ...interface{}) {
 	logger.mensagem = mensagem
 	fmt.Println(mensagem)
-	logger.log.
-		Debug().
-		Caller(1).
-		Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
-		Msg(mensagem)
+	if logger.SalvarEmArquivo {
+		logger.log.
+			Debug().
+			Caller(1).
+			Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
+			Msg(mensagem)
+	}
 }
 
 // Rastreamento: cria um log de rastreamento
 func (logger *LoggerType) Rastreamento(mensagem string, dados ...interface{}) {
 	logger.mensagem = mensagem
 	fmt.Println(mensagem)
-	logger.log.
-		Trace().
-		Caller(1).
-		Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
-		Msg(mensagem)
+	if logger.SalvarEmArquivo {
+		logger.log.
+			Trace().
+			Caller(1).
+			Str("Dados Adicionais", logger.converterSliceDadosParaJsonString(dados)).
+			Msg(mensagem)
+	}
 }
 
 // converterSliceDadosParaJsonString: converte uma interface para jsonString

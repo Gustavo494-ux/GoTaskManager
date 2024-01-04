@@ -1,7 +1,7 @@
 package encryption
 
 import (
-	"GoTaskManager/internal/app/inicializar"
+	// "GoTaskManager/internal/app/inicializar"
 	"GoTaskManager/pkg/pacotes/logger"
 	"os"
 	"testing"
@@ -9,7 +9,6 @@ import (
 
 // TestMain:Função executada antes das demais
 func TestMain(m *testing.M) {
-	inicializar.InicializarParaTestes()
 	exitCode := m.Run()
 	if exitCode == 0 {
 		logger.Logger().Info("Testes do pacote encryption executados com sucesso!")

@@ -1,10 +1,9 @@
 package manipuladorDeArquivos_test
 
 import (
-	"GoTaskManager/internal/app/inicializar"
 	"GoTaskManager/pkg/pacotes/logger"
 	"GoTaskManager/pkg/pacotes/manipuladorDeArquivos"
-
+	// "GoTaskManager/pkg/routines/configuracoes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,8 +13,6 @@ import (
 
 // TestMain:Função executada antes das demais
 func TestMain(m *testing.M) {
-	inicializar.InicializarParaTestes()
-
 	exitCode := m.Run()
 
 	if exitCode == 0 {

@@ -1,7 +1,6 @@
 package authentication_test
 
 import (
-	"GoTaskManager/internal/app/inicializar"
 	"GoTaskManager/pkg/pacotes/authentication"
 	"GoTaskManager/pkg/pacotes/logger"
 	"encoding/json"
@@ -14,8 +13,6 @@ import (
 
 // TestMain:Função executada antes das demais
 func TestMain(m *testing.M) {
-	inicializar.InicializarParaTestes()
-
 	authentication.DefinirSecretKey("secrectKey")
 
 	exitCode := m.Run()

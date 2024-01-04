@@ -2,6 +2,7 @@ package configuracoes
 
 import (
 	"GoTaskManager/pkg/pacotes/logger"
+	tipo "GoTaskManager/pkg/pacotes/tipos"
 	"os"
 )
 
@@ -11,7 +12,11 @@ const (
 
 // ConfigurarLogger: configura o Log
 func ConfigurarLogger(CaminhoArquivoLog string) {
-	caminhoFormatado := PrepararCaminhoArquivo(CaminhoArquivoLog)
+	if len(CaminhoArquivoLog) == 0 {
+		CaminhoArquivoLog = CaminhoRelativoPadraoArquivoLog
+	}
+
+	caminhoFormatado := PrepararCaminhoArquivo(tipo.Coalesce().Str(CaminhoArquivoLog, CaminhoRelativoPadraoArquivoLog))
 	PreencherVariaveisLog(caminhoFormatado)
 }
 
