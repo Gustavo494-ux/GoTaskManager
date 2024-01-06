@@ -10,11 +10,13 @@ import (
 )
 
 var (
-	//BancoProducao: banco de dados destinado a uso efetivo do programa
-	BancoProducao *database.ConfiguracaoBancoDeDados
+	BancoPrincipalGORM *gorm.DB
+
+	//ConfiguracaoBancoProducao: banco de dados destinado a uso efetivo do programa
+	ConfiguracaoBancoProducao *database.ConfiguracaoBancoDeDados
 
 	//BancoTeste: banco de dados destiando a uso durante os testes automatizados
-	BancoTeste *database.ConfiguracaoBancoDeDados
+	ConfiguracaoBancoTeste *database.ConfiguracaoBancoDeDados
 )
 
 // ConfigurarNovoBanco: Carrega configura os dados para conexão com o banco
@@ -45,8 +47,8 @@ func ConectarSQLX(c *database.ConfiguracaoBancoDeDados) *sqlx.DB {
 }
 
 // CriarTabelasGORM: cria as tabelas do banco de dados utilizando o GORM
-func CriarTabelasGORM(c *database.ConfiguracaoBancoDeDados, tabelas []interface{}) {
-	if c != nil {
-		database.CriarTabelasGORM(c.ConectarGorm(), tabelas)
+func CriarTabelasGORM(db *gorm.DB, tabelas []interface{}) {
+	if db != nil {
+		database.CriarTabelasGORM(db, tabelas)
 	}
 }

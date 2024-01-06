@@ -23,7 +23,6 @@ func CriarUsuario(u *models.Usuario) (err error) {
 	}
 
 	if err = repositorio.CriarUsuario(u); err != nil {
-		logger.Logger().Error("Ocorreu um erro ao criar o usuário no banco", err, u)
 		return
 	}
 

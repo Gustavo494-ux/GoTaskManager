@@ -56,7 +56,7 @@ func CarregarDiretorioRaiz() string {
 
 // InicializarBancoDeDadosPrincipal: inicializa o banco de dados para uso
 func InicializarBancoDeDadosPrincipal() {
-	configuracoes.BancoProducao = configuracoes.ConfigurarNovoBanco(
+	configuracoes.ConfiguracaoBancoProducao = configuracoes.ConfigurarNovoBanco(
 		os.Getenv("HOST_DATABASE"),
 		os.Getenv("NOME_DATABASE"),
 		os.Getenv("USUARIO_DATABASE"),
@@ -65,11 +65,13 @@ func InicializarBancoDeDadosPrincipal() {
 		os.Getenv("SSLMODE_DATABASE"),
 		os.Getenv("PORTA_DATABASE"),
 	)
+
+	configuracoes.BancoPrincipalGORM = configuracoes.ConfiguracaoBancoProducao.ConectarGorm()
 }
 
 // InicializarBancoDeDadosTeste: inicializa o banco de dados para uso dos testes
 func InicializarBancoDeDadosTeste() {
-	configuracoes.BancoProducao = configuracoes.ConfigurarNovoBanco(
+	configuracoes.ConfiguracaoBancoTeste = configuracoes.ConfigurarNovoBanco(
 		os.Getenv("HOST_DATABASE_TESTE "),
 		os.Getenv("NOME_DATABASE_TESTE "),
 		os.Getenv("USUARIO_DATABASE_TESTE "),

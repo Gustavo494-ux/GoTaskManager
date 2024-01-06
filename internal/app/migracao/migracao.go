@@ -11,6 +11,5 @@ func CriacaoAutomaticaTabelas() {
 
 	tabelas = append(tabelas, models.Usuario{})
 
-	configuracoes.CriarTabelasGORM(configuracoes.BancoProducao, tabelas)
-	configuracoes.CriarTabelasGORM(configuracoes.BancoTeste, tabelas)
+	configuracoes.CriarTabelasGORM(configuracoes.BancoPrincipalGORM, tabelas)
 }
