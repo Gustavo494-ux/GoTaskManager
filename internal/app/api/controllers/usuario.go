@@ -1,19 +1,31 @@
 package controllers
 
 import (
-	"GoTaskManager/pkg/pacotes/authentication"
+	"GoTaskManager/internal/app/models"
+	"GoTaskManager/internal/app/services"
+	"GoTaskManager/pkg/pacotes/logger"
+	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
 
 // CriarUsuario insere um usuário no banco de dados.
-func CriarUsuario(c echo.Context) error {
-	token, _ := authentication.NovoToken(true, time.Now().Add(time.Second*10).Unix()).AdicionarParametro("Usuario", "Gustavo").Criar()
-	return c.JSON(http.StatusAccepted, token)
+func CriarUsuario(c echo.Context) (err error) {
+	var novoUsuario *models.Usuario
+	json.NewDecoder(c.Request().Body).Decode(&novoUsuario)
+	if err = services.CriarUsuario(novoUsuario); err != nil {
 
-	// return c.JSON(http.StatusNotFound, "Rota em desenvolvimento")
+		logger.Logger().Error("Ocorreu um erro criar o usuário", err, novoUsuario)
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	resposta := map[string]interface{}{
+		"mensagem": "O usuário foi criado com sucesso!",
+	}
+
+	return c.JSON(http.StatusOK, resposta)
+
 }
 
 // BuscarUsuarioPorId encontra um usuário no banco de dados por ID.
