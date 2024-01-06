@@ -2,6 +2,7 @@ package inicializar
 
 import (
 	"GoTaskManager/internal/app/api"
+	"GoTaskManager/internal/app/migracao"
 	"GoTaskManager/pkg/pacotes/logger"
 	"GoTaskManager/pkg/pacotes/manipuladorDeArquivos"
 	"GoTaskManager/pkg/routines/configuracoes"
@@ -24,6 +25,14 @@ func init() {
 func Inicializar() {
 	InicializarLogger()
 	InicializarBancoDeDadosPrincipal()
+	InicializarTabelasBancoDeDados()
+	InicializarAPI()
+}
+
+// InicializarParaTestes: realiza configurações para execução dos testes
+func InicializarParaTestes() {
+	InicializarLogger()
+	InicializarBancoDeDadosTeste()
 	InicializarAPI()
 }
 
@@ -32,12 +41,6 @@ func DefinirDiretorioRaiz() {
 	diretorioRaiz = CarregarDiretorioRaiz()
 	configuracoes.DefinirDiretorioRoot(diretorioRaiz)
 	manipuladorDeArquivos.DefinirDiretorioRaiz(diretorioRaiz)
-}
-
-// InicializarParaTestes: realiza configurações para execução dos testes
-func InicializarParaTestes() {
-	InicializarLogger()
-	InicializarBancoDeDadosTeste()
 }
 
 // InicializarLogger: realize toda a configuração necessaria para utilização do logger
@@ -97,4 +100,9 @@ func InicializarBancoDeDadosTeste() {
 		os.Getenv("SSLMODE_DATABASE_TESTE "),
 		porta,
 	)
+}
+
+// InicializarTabelasBancoDeDados: cria as tabelas do banco de dados automaticamente
+func InicializarTabelasBancoDeDados() {
+	migracao.CriacaoAutomaticaTabelas()
 }

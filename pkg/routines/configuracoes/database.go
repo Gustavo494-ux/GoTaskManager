@@ -37,3 +37,10 @@ func ConectarGorm(c *database.ConfiguracaoBancoDeDados) *gorm.DB {
 func ConectarSQLX(c *database.ConfiguracaoBancoDeDados) *sqlx.DB {
 	return c.ConectarSQLX()
 }
+
+// CriarTabelasGORM: cria as tabelas do banco de dados utilizando o GORM
+func CriarTabelasGORM(c *database.ConfiguracaoBancoDeDados, tabelas []interface{}) {
+	if c != nil {
+		database.CriarTabelasGORM(c.ConectarGorm(), tabelas)
+	}
+}
