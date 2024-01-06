@@ -2,6 +2,8 @@ package configuracoes
 
 import (
 	"GoTaskManager/pkg/pacotes/database"
+	"GoTaskManager/pkg/pacotes/logger"
+	"strconv"
 
 	"github.com/jmoiron/sqlx"
 	"gorm.io/gorm"
@@ -16,7 +18,11 @@ var (
 )
 
 // ConfigurarNovoBanco: Carrega configura os dados para conexão com o banco
-func ConfigurarNovoBanco(host, nomeBanco, usuario, senha, nomeDoDriver, sslmode string, porta int) *database.ConfiguracaoBancoDeDados {
+func ConfigurarNovoBanco(host, nomeBanco, usuario, senha, nomeDoDriver, sslmode string, porta string) *database.ConfiguracaoBancoDeDados {
+	portaInt, err := strconv.Atoi(porta)
+	if err != nil {
+		logger.Logger().Fatal("Ocorreu um erro ao converter a PORTA_DATABASE_TESTE para string", err)
+	}
 	return database.Novo(
 		host,
 		nomeBanco,
@@ -24,7 +30,7 @@ func ConfigurarNovoBanco(host, nomeBanco, usuario, senha, nomeDoDriver, sslmode 
 		senha,
 		nomeDoDriver,
 		sslmode,
-		porta,
+		portaInt,
 	)
 }
 
