@@ -27,3 +27,8 @@ func InicializarAPI() {
 func InicializarTabelasBancoDeDados() {
 	migracao.CriacaoAutomaticaTabelas()
 }
+
+// RetonarPortaApi: retorna a porta na qual a api está sendo executada
+func RetonarPortaApi() int {
+	return api.PortaApi
+}

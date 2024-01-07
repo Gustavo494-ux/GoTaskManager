@@ -72,12 +72,13 @@ func InicializarBancoDeDadosPrincipal() {
 // InicializarBancoDeDadosTeste: inicializa o banco de dados para uso dos testes
 func InicializarBancoDeDadosTeste() {
 	configuracoes.ConfiguracaoBancoTeste = configuracoes.ConfigurarNovoBanco(
-		os.Getenv("HOST_DATABASE_TESTE "),
-		os.Getenv("NOME_DATABASE_TESTE "),
-		os.Getenv("USUARIO_DATABASE_TESTE "),
-		os.Getenv("SENHA_DATABASE_TESTE "),
-		os.Getenv("NOME_DRIVER_DATABASE_TESTE "),
-		os.Getenv("SSLMODE_DATABASE_TESTE "),
+		os.Getenv("HOST_DATABASE_TESTE"),
+		os.Getenv("NOME_DATABASE_TESTE"),
+		os.Getenv("USUARIO_DATABASE_TESTE"),
+		os.Getenv("SENHA_DATABASE_TESTE"),
+		os.Getenv("NOME_DRIVER_DATABASE_TESTE"),
+		os.Getenv("SSLMODE_DATABASE_TESTE"),
 		os.Getenv("PORTA_DATABASE_TESTE"),
 	)
+	configuracoes.BancoPrincipalGORM = configuracoes.ConfiguracaoBancoTeste.ConectarGorm()
 }
