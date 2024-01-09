@@ -12,18 +12,18 @@ import (
 // Authenticate: realiza a autenticação de todas as requisições que necessitam de autenticação
 func Authenticate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		token := authentication.ExtrairToken(*c.Request())
 		if err := validarToken(c); err != nil {
-			return err
+			logger.Logger().Info(fmt.Sprintf("Token %s inválido", token))
+			return c.JSON(http.StatusUnauthorized, "o token informado é inválido")
 		}
 
 		if err := authentication.IsExpirado(*c.Request()); err != nil {
-			return err
+			logger.Logger().Info(fmt.Sprintf("Token %s expirou", token))
+			return c.JSON(http.StatusUnauthorized, "o token informado expirou")
 		}
 
-		if err := proximaFuncao(c, next); err != nil {
-			return err
-		}
-		return nil
+		return proximaFuncao(c, next)
 	}
 }
 

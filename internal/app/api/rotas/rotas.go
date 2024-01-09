@@ -40,4 +40,5 @@ func configurarRotas(e *echo.Echo) {
 	})
 
 	RotasUsuario(e)
+	RotasLogin(e)
 }
