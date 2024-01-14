@@ -25,7 +25,6 @@ func CriarUsuario(c echo.Context) (err error) {
 	}
 
 	return c.JSON(http.StatusOK, resposta)
-
 }
 
 // BuscarUsuarioPorId encontra um usuário no banco de dados por ID.
@@ -35,7 +34,17 @@ func BuscarUsuarioPorId(c echo.Context) error {
 
 // BuscarUsuarioPorEmail encontra um usuário no banco de dados por Email.
 func BuscarUsuarioPorEmail(c echo.Context) error {
-	return c.JSON(http.StatusNotFound, "Rota em desenvolvimento")
+	email := c.Param("email")
+	usuario, err := services.BuscarUsuarioPorEmail(email)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	if usuario.ID == 0 {
+		return ResponderString(c, http.StatusNotFound, "usuário não encontrado")
+	}
+
+	return c.JSON(http.StatusOK, usuario)
 }
 
 // BuscarTodosUsuarios recupera todos os usuários salvos no banco de dados.

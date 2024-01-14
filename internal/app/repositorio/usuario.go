@@ -13,3 +13,9 @@ func CriarUsuario(u *models.Usuario) (err error) {
 	}
 	return
 }
+
+// BuscarUsuarioPorEmail: busca um usuário no banco de dados pelo seu email
+func BuscarUsuarioPorEmail(email string) (usuario *models.Usuario) {
+	configuracoes.BancoPrincipalGORM.Where("email =?", email).First(&usuario)
+	return
+}
