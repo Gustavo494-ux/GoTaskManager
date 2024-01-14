@@ -3,6 +3,8 @@ package GerenciadordeJson_test
 import (
 	"GoTaskManager/pkg/pacotes/GerenciadordeJson"
 	"GoTaskManager/pkg/pacotes/logger"
+	"GoTaskManager/pkg/routines/inicializarpkg"
+	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
@@ -10,8 +12,8 @@ import (
 
 // TestMain:Função executada antes das demais
 func TestMain(m *testing.M) {
+	inicializarpkg.InicializarLogger()
 	exitCode := m.Run()
-
 	if exitCode == 0 {
 		logger.Logger().Info("Testes do pacote GerenciadordeJson executados com sucesso!")
 	} else {
@@ -68,6 +70,52 @@ func TestJsonStringParaInterface(t *testing.T) {
 			err,
 			fmt.Sprintf("JSON esperado: %s, JSON retornado: %s", expected, jsonStr),
 		)
+		t.FailNow()
+	}
+
+	logger.Logger().Info("Teste " + t.Name() + ":	Executado com sucesso!")
+}
+
+func TestIgnorarCamposPelaTag(t *testing.T) {
+	type MeuStruct struct {
+		Campo1 string `minhaTag:"valor1"`
+		Campo2 string `minhaTag:"valor2"`
+		Campo3 string `minhaTag:"valor1"`
+	}
+
+	meuObjeto := MeuStruct{
+		Campo1: "valor1",
+		Campo2: "valor2",
+		Campo3: "valor1",
+	}
+
+	j, err := GerenciadordeJson.IgnorarCamposPelaTag(meuObjeto, "minhaTag", "valor1")
+	if err != nil {
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao executar a função IgnorarCamposPelaTag", err)
+		t.FailNow()
+	}
+
+	if !json.Valid(j) {
+		logger.Logger().Error("Teste "+t.Name()+":	A função IgnorarCamposPelaTag não retornou um JSON válido", nil, string(j))
+		t.FailNow()
+	}
+
+	var m map[string]interface{}
+	err = json.Unmarshal(j, &m)
+	if err != nil {
+		logger.Logger().Error("Teste "+t.Name()+":	Ocorreu um erro ao deserializar o JSON", err, string(j))
+		t.FailNow()
+	}
+
+	_, existe := m["Campo1"]
+	if existe {
+		logger.Logger().Error("Teste "+t.Name()+":	A função IgnorarCamposPelaTag não ignorou os campos que atendem à condição", err)
+		t.FailNow()
+	}
+
+	_, existe = m["Campo2"]
+	if !existe {
+		logger.Logger().Error("Teste "+t.Name()+":	A função IgnorarCamposPelaTag não incluiu os campos que não atendem à condição", err)
 		t.FailNow()
 	}
 
