@@ -46,6 +46,11 @@ func TestMain(m *testing.M) {
 func TestCriarUsuario(t *testing.T) {
 	URLCriarUsuario = URLbase + "usuario"
 	t.Parallel()
+	if len(Usuarios) == 0 {
+		logger.Logger().Error(fmt.Sprintf("Teste %s: Nenhum usuário foi passado para a realização do teste", t.Name()), nil)
+		t.FailNow()
+	}
+
 	tempo := time.Now()
 	for _, usuario := range Usuarios {
 		requisicao := clientehttp.POST(URLCriarUsuario, usuario)
