@@ -6,6 +6,7 @@ import (
 	"GoTaskManager/internal/utils"
 	"GoTaskManager/pkg/pacotes/GerenciadordeJson"
 	"GoTaskManager/pkg/pacotes/logger"
+	"GoTaskManager/pkg/routines/configuracoes"
 	"encoding/json"
 	"errors"
 )
@@ -32,6 +33,16 @@ func BuscarUsuarioPorEmail(email string) (usuario *models.Usuario, err error) {
 	}
 	usuario = repositorio.BuscarUsuarioPorEmail(email)
 	TratarUsuarioParaResposta(usuario)
+	return
+}
+
+// DeletarUsuario: deleta um usuário do banco de dados
+func DeletarUsuario(id uint) (err error) {
+	return configuracoes.BancoPrincipalGORM.Delete(&models.Usuario{}, id).Error
+}
+
+func BuscarUsuarioPorId(id uint) (usuario models.Usuario, err error) {
+	err = configuracoes.BancoPrincipalGORM.First(&usuario, id).Error
 	return
 }
 
