@@ -40,29 +40,6 @@ func POST(URL string, body any) (requisicao *request) {
 	return
 }
 
-func GET(URL string) (requisicao *request) {
-	response, err := http.Get(URL)
-	if err != nil {
-		logger.Logger().Error("Ocorreu um erro ao realizar uma requisição GET", err, URL)
-		return
-	}
-
-	defer response.Body.Close()
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		logger.Logger().Error("Ocorreu um erro ao ler a resposta", err)
-		return
-	}
-
-	requisicao = &request{
-		resposta:   response,
-		err:        err,
-		body:       body,
-		statusCode: response.StatusCode,
-	}
-	return
-}
-
 // GetBody: retorna o corpo da requisição como slice de bytes
 func (requisicao *request) GetBody() (body []byte, err error) {
 	body, err = io.ReadAll(requisicao.resposta.Body)
