@@ -1,10 +1,10 @@
 package middlewares
 
 import (
-	"GoTaskManager/pkg/pacotes/logger"
 	"fmt"
 	"time"
 
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )

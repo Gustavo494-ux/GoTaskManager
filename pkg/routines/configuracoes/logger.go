@@ -1,9 +1,10 @@
 package configuracoes
 
 import (
-	"GoTaskManager/pkg/pacotes/logger"
-	tipo "GoTaskManager/pkg/pacotes/tipos"
 	"os"
+
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
+	"github.com/Gustavo494-ux/PacotesGolang/tipo"
 )
 
 const (

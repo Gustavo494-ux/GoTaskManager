@@ -4,9 +4,10 @@ import (
 	"GoTaskManager/internal/app/models"
 	"GoTaskManager/internal/app/repositorio"
 	"GoTaskManager/internal/utils"
-	"GoTaskManager/pkg/pacotes/authentication"
 	"errors"
 	"time"
+
+	"github.com/Gustavo494-ux/PacotesGolang/authentication"
 )
 
 // CriarUsuario: cria um novo usuário no banco de dados

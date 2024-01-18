@@ -1,8 +1,9 @@
 package configuracoes
 
 import (
-	"GoTaskManager/pkg/pacotes/authentication"
 	"os"
+
+	"github.com/Gustavo494-ux/PacotesGolang/authentication"
 )
 
 // ConfigurarAutenticacao: configura a autenticacao

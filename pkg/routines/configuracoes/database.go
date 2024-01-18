@@ -1,10 +1,10 @@
 package configuracoes
 
 import (
-	"GoTaskManager/pkg/pacotes/database"
-	"GoTaskManager/pkg/pacotes/logger"
 	"strconv"
 
+	"github.com/Gustavo494-ux/PacotesGolang/database"
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
 	"github.com/jmoiron/sqlx"
 	"gorm.io/gorm"
 )

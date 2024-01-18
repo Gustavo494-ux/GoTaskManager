@@ -3,10 +3,10 @@ package controllers
 import (
 	"GoTaskManager/internal/app/models"
 	"GoTaskManager/internal/app/services"
-	"GoTaskManager/pkg/pacotes/logger"
 	"encoding/json"
 	"net/http"
 
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
 	"github.com/labstack/echo/v4"
 )
 

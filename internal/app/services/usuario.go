@@ -4,10 +4,11 @@ import (
 	"GoTaskManager/internal/app/models"
 	"GoTaskManager/internal/app/repositorio"
 	"GoTaskManager/internal/utils"
-	"GoTaskManager/pkg/pacotes/GerenciadordeJson"
-	"GoTaskManager/pkg/pacotes/logger"
 	"encoding/json"
 	"errors"
+
+	"github.com/Gustavo494-ux/PacotesGolang/GerenciadordeJson"
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
 )
 
 // CriarUsuario: cria um novo usuário no banco de dados

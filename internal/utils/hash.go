@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"GoTaskManager/pkg/pacotes/encryption"
-	"GoTaskManager/pkg/pacotes/logger"
+	"github.com/Gustavo494-ux/PacotesGolang/encryption"
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
 )
 
 // GerarHash: gera um hash a partir do parametro passado

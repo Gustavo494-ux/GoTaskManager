@@ -1,10 +1,11 @@
 package inicializarpkg
 
 import (
-	"GoTaskManager/pkg/pacotes/manipuladorDeArquivos"
 	"GoTaskManager/pkg/routines/configuracoes"
 	"os"
 	"path/filepath"
+
+	"github.com/Gustavo494-ux/PacotesGolang/manipuladorDeArquivos"
 )
 
 var (

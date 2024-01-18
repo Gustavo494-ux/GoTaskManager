@@ -2,8 +2,9 @@ package repositorio
 
 import (
 	"GoTaskManager/internal/app/models"
-	"GoTaskManager/pkg/pacotes/logger"
 	"GoTaskManager/pkg/routines/configuracoes"
+
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
 )
 
 // CriarUsuario: cria um novo usuário no banco de dados

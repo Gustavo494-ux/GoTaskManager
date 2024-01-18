@@ -1,8 +1,9 @@
 package configuracoes
 
 import (
-	"GoTaskManager/pkg/pacotes/manipuladorDeArquivos"
 	"log"
+
+	"github.com/Gustavo494-ux/PacotesGolang/manipuladorDeArquivos"
 )
 
 var (

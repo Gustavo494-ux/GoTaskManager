@@ -2,11 +2,11 @@ package api
 
 import (
 	"GoTaskManager/internal/app/api/rotas"
-	"GoTaskManager/pkg/pacotes/logger"
 	"fmt"
 	"strconv"
 	"time"
 
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
 	"github.com/labstack/echo/v4"
 )
 

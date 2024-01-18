@@ -4,14 +4,15 @@ import (
 	"GoTaskManager/internal/app/inicializar"
 	"GoTaskManager/internal/app/inicializar/inicializarinternal"
 	"GoTaskManager/internal/app/models"
-	clientehttp "GoTaskManager/pkg/pacotes/clienteHttp"
-	"GoTaskManager/pkg/pacotes/logger"
 	"fmt"
 	"net/http"
 	"os"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/Gustavo494-ux/PacotesGolang/clienteHttp"
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
 )
 
 var (
@@ -50,7 +51,6 @@ func TestCriarUsuario(t *testing.T) {
 		logger.Logger().Error(fmt.Sprintf("Teste %s: Nenhum usuário foi passado para a realização do teste", t.Name()), nil)
 		t.FailNow()
 	}
-
 	tempo := time.Now()
 	for _, usuario := range Usuarios {
 		requisicao := clientehttp.POST(URLCriarUsuario, usuario)

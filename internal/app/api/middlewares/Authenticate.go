@@ -1,11 +1,11 @@
 package middlewares
 
 import (
-	"GoTaskManager/pkg/pacotes/authentication"
-	"GoTaskManager/pkg/pacotes/logger"
 	"fmt"
 	"net/http"
 
+	"github.com/Gustavo494-ux/PacotesGolang/authentication"
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
 	"github.com/labstack/echo/v4"
 )
 
