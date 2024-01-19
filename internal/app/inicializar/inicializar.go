@@ -2,7 +2,8 @@ package inicializar
 
 import (
 	"GoTaskManager/internal/app/inicializar/inicializarinternal"
-	"GoTaskManager/pkg/routines/inicializarpkg"
+
+	"github.com/Gustavo494-ux/PacotesGolang/inicializarpkg"
 )
 
 func Inicializar() {

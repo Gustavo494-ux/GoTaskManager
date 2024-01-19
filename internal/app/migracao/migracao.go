@@ -2,7 +2,8 @@ package migracao
 
 import (
 	"GoTaskManager/internal/app/models"
-	"GoTaskManager/pkg/routines/configuracoes"
+
+	"github.com/Gustavo494-ux/PacotesGolang/configuracoes"
 )
 
 // CriacaoAutomaticaTabelas: criação automatica das tabelas no GORM

@@ -2,8 +2,8 @@ package repositorio
 
 import (
 	"GoTaskManager/internal/app/models"
-	"GoTaskManager/pkg/routines/configuracoes"
 
+	"github.com/Gustavo494-ux/PacotesGolang/configuracoes"
 	"github.com/Gustavo494-ux/PacotesGolang/logger"
 )
 

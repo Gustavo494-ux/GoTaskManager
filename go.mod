@@ -4,7 +4,6 @@ go 1.20
 
 require (
 	github.com/Gustavo494-ux/PacotesGolang v0.0.1
-	github.com/jmoiron/sqlx v1.3.5
 	github.com/labstack/echo/v4 v4.11.4
 	gorm.io/gorm v1.25.5
 )
@@ -13,6 +12,7 @@ require (
 	github.com/duaneking/coalesce v0.0.0-20221228221308-65b26e6ee26e // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/lib/pq v1.10.9 // indirect
