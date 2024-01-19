@@ -40,7 +40,7 @@ func BuscarUsuarioPorEmail(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	if usuario.ID == 0 {
+	if usuario == nil {
 		return ResponderString(c, http.StatusNotFound, "usuário não encontrado")
 	}
 

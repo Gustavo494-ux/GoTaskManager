@@ -38,18 +38,25 @@ func BuscarUsuarioPorEmail(email string) (usuario *models.Usuario, err error) {
 
 // TratarUsuarioParaResposta: trata o usuário para responder a solicitação de forma adequada
 func TratarUsuarioParaResposta(usuarioInput *models.Usuario) {
+	if usuarioInput == nil {
+		return
+	}
+
+	if usuarioInput.ID == 0 {
+		usuarioInput = nil
+		return
+	}
+
 	jsonByte, err := GerenciadordeJson.IgnorarCamposPelaTag(*usuarioInput, "serializar", "false")
 	if err != nil {
 		logger.Logger().Error("Ocorreu um erro ao remover os campos com a tag serializar contendo o valor 'false' do struct", err, usuarioInput)
 		return
 	}
-	usuarioTemporario := models.Usuario{}
+	*usuarioInput = models.Usuario{Model: usuarioInput.Model}
 
-	err = json.Unmarshal(jsonByte, &usuarioTemporario)
+	err = json.Unmarshal(jsonByte, usuarioInput)
 	if err != nil {
 		logger.Logger().Error("Ocorreu um erro ao desserializar o json para o struct de usuário", err, jsonByte, usuarioInput)
 		return
 	}
-
-	*usuarioInput = usuarioTemporario
 }
