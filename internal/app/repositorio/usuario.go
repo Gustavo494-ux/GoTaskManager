@@ -26,3 +26,9 @@ func BuscarTodosUsuarios() (usuarios []*models.Usuario) {
 	configuracoes.BancoPrincipalGORM.Find(&usuarios)
 	return
 }
+
+// BuscarUsuarioPorId: busca o usuário utilizando o ID
+func BuscarUsuarioPorId(id uint) (usuarios *models.Usuario) {
+	configuracoes.BancoPrincipalGORM.First(&usuarios, id)
+	return
+}

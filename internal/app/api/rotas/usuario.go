@@ -15,7 +15,7 @@ func RotasUsuario(e *echo.Echo) {
 	userGroup.Use(middlewares.Authenticate)
 
 	userGroup.GET("", controllers.BuscarTodosUsuarios)
-	userGroup.GET("/:usuarioId", controllers.BuscarUsuarioPorId)
+	userGroup.GET("/id/:usuarioId", controllers.BuscarUsuarioPorId)
 	userGroup.GET("/:email", controllers.BuscarUsuarioPorEmail)
 	userGroup.PUT("/:usuarioId", controllers.AtualizarUsuario)
 	userGroup.DELETE("/:usuarioId", controllers.DeletarUsuario)

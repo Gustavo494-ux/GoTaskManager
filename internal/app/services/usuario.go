@@ -43,6 +43,13 @@ func BuscarTodosUsuarios() (usuarios []*models.Usuario, err error) {
 	return
 }
 
+// BuscarUsuarioPorId: busca o usuário utilizando o ID
+func BuscarUsuarioPorId(id uint) (usuario *models.Usuario, err error) {
+	usuario = repositorio.BuscarUsuarioPorId(id)
+	TratarUsuarioParaResposta(usuario)
+	return
+}
+
 // TratarUsuarioParaResposta: trata o usuário para responder a solicitação de forma adequada
 func TratarUsuarioParaResposta(usuariosInput ...*models.Usuario) {
 	for _, usuarioInput := range usuariosInput {

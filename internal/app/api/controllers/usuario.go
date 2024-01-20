@@ -5,6 +5,7 @@ import (
 	"GoTaskManager/internal/app/services"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/Gustavo494-ux/PacotesGolang/logger"
 	"github.com/labstack/echo/v4"
@@ -29,7 +30,21 @@ func CriarUsuario(c echo.Context) (err error) {
 
 // BuscarUsuarioPorId encontra um usuário no banco de dados por ID.
 func BuscarUsuarioPorId(c echo.Context) error {
-	return c.JSON(http.StatusNotFound, "Rota em desenvolvimento")
+	usuarioId, err := strconv.Atoi(c.Param("usuarioId"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	usuario, err := services.BuscarUsuarioPorId(uint(usuarioId))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	if usuario == nil {
+		return ResponderString(c, http.StatusNotFound, "usuário não encontrado")
+	}
+
+	return c.JSON(http.StatusOK, usuario)
 }
 
 // BuscarUsuarioPorEmail encontra um usuário no banco de dados por Email.
