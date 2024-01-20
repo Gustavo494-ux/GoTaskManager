@@ -7,8 +7,8 @@ import (
 // ResponderErro: responde a requisição com uma mensagem de erro
 func ResponderErro(c echo.Context, statusCode int, err error) error {
 	resposta := map[string]interface{}{
-		"error":      err.Error(),
-		"statuscode": statusCode,
+		"error": err.Error(),
+		// "statuscode": statusCode,
 	}
 	return c.JSON(statusCode, resposta)
 }

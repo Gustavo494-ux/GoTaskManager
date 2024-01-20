@@ -21,12 +21,7 @@ func CriarUsuario(c echo.Context) (err error) {
 		logger.Logger().Error("Ocorreu um erro criar o usuário", err, novoUsuario)
 		return c.JSON(http.StatusBadRequest, err)
 	}
-
-	resposta := map[string]interface{}{
-		"mensagem": "O usuário foi criado com sucesso!",
-	}
-
-	return c.JSON(http.StatusOK, resposta)
+	return ResponderString(c, http.StatusOK, "O usuário foi criado com sucesso!")
 }
 
 // BuscarUsuarioPorId encontra um usuário no banco de dados por ID.
@@ -41,11 +36,7 @@ func BuscarUsuarioPorId(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 
-	if usuario == nil {
-		return ResponderString(c, http.StatusNotFound, "usuário não encontrado")
-	}
-
-	return c.JSON(http.StatusOK, usuario)
+	return ResponderUsuario(c, http.StatusOK, "", usuario)
 }
 
 // BuscarUsuarioPorEmail encontra um usuário no banco de dados por Email.
@@ -56,11 +47,7 @@ func BuscarUsuarioPorEmail(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	if usuario == nil {
-		return ResponderString(c, http.StatusNotFound, "usuário não encontrado")
-	}
-
-	return c.JSON(http.StatusOK, usuario)
+	return ResponderUsuario(c, http.StatusOK, "", usuario)
 }
 
 // BuscarTodosUsuarios recupera todos os usuários salvos no banco de dados.
@@ -69,12 +56,7 @@ func BuscarTodosUsuarios(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
-
-	if usuarios == nil {
-		return ResponderString(c, http.StatusNotFound, "usuários não encontrado")
-	}
-
-	return c.JSON(http.StatusOK, usuarios)
+	return ResponderUsuario(c, http.StatusOK, "", usuarios...)
 }
 
 // AtualizarUsuario atualiza as informações do usuário no banco de dados.
@@ -101,7 +83,7 @@ func AtualizarUsuario(c echo.Context) error {
 		)
 	}
 
-	return ResponderString(c, http.StatusOK, "usuário atualizado")
+	return ResponderUsuario(c, http.StatusOK, "usuário atualizado")
 }
 
 // DeletarUsuario Deleta um usuário do banco de dados.
@@ -118,4 +100,30 @@ func DeletarUsuario(c echo.Context) error {
 		)
 	}
 	return ResponderString(c, http.StatusOK, "usuário deletado")
+}
+
+func ResponderUsuario(c echo.Context, statusCodeSucesso int, mensagemSucesso string, usuarios ...*models.Usuario) (err error) {
+	existeUsuario := false
+	for _, usuario := range usuarios {
+
+		if usuario == nil {
+			continue
+		}
+
+		if usuario.ID == 0 {
+			continue
+		}
+		existeUsuario = true
+
+	}
+
+	if !existeUsuario {
+		return ResponderString(c, http.StatusNotFound, "nenhum usuário não encontrado")
+	}
+
+	if mensagemSucesso != "" {
+		return ResponderString(c, statusCodeSucesso, mensagemSucesso)
+	} else {
+		return c.JSON(statusCodeSucesso, usuarios)
+	}
 }
