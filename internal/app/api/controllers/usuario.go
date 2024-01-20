@@ -49,7 +49,16 @@ func BuscarUsuarioPorEmail(c echo.Context) error {
 
 // BuscarTodosUsuarios recupera todos os usuários salvos no banco de dados.
 func BuscarTodosUsuarios(c echo.Context) error {
-	return c.JSON(http.StatusNotFound, "Rota em desenvolvimento")
+	usuarios, err := services.BuscarTodosUsuarios()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	if usuarios == nil {
+		return ResponderString(c, http.StatusNotFound, "usuários não encontrado")
+	}
+
+	return c.JSON(http.StatusOK, usuarios)
 }
 
 // AtualizarUsuario atualiza as informações do usuário no banco de dados.

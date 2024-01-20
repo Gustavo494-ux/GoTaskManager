@@ -36,27 +36,36 @@ func BuscarUsuarioPorEmail(email string) (usuario *models.Usuario, err error) {
 	return
 }
 
+// BuscarTodosUsuarios: busca todos os usuários do banco de dados
+func BuscarTodosUsuarios() (usuarios []*models.Usuario, err error) {
+	usuarios = repositorio.BuscarTodosUsuarios()
+	TratarUsuarioParaResposta(usuarios...)
+	return
+}
+
 // TratarUsuarioParaResposta: trata o usuário para responder a solicitação de forma adequada
-func TratarUsuarioParaResposta(usuarioInput *models.Usuario) {
-	if usuarioInput == nil {
-		return
-	}
+func TratarUsuarioParaResposta(usuariosInput ...*models.Usuario) {
+	for _, usuarioInput := range usuariosInput {
+		if usuarioInput == nil {
+			return
+		}
 
-	if usuarioInput.ID == 0 {
-		usuarioInput = nil
-		return
-	}
+		if usuarioInput.ID == 0 {
+			usuarioInput = nil
+			return
+		}
 
-	jsonByte, err := GerenciadordeJson.IgnorarCamposPelaTag(*usuarioInput, "serializar", "false")
-	if err != nil {
-		logger.Logger().Error("Ocorreu um erro ao remover os campos com a tag serializar contendo o valor 'false' do struct", err, usuarioInput)
-		return
+		jsonByte, err := GerenciadordeJson.IgnorarCamposPelaTag(*usuarioInput, "serializar", "false")
+		if err != nil {
+			logger.Logger().Error("Ocorreu um erro ao remover os campos com a tag serializar contendo o valor 'false' do struct", err, usuarioInput)
+			return
+		}
+		*usuarioInput = models.Usuario{Model: usuarioInput.Model}
+		err = json.Unmarshal(jsonByte, usuarioInput)
+		if err != nil {
+			logger.Logger().Error("Ocorreu um erro ao desserializar o json para o struct de usuário", err, jsonByte, usuarioInput)
+			return
+		}
 	}
-	*usuarioInput = models.Usuario{Model: usuarioInput.Model}
-
-	err = json.Unmarshal(jsonByte, usuarioInput)
-	if err != nil {
-		logger.Logger().Error("Ocorreu um erro ao desserializar o json para o struct de usuário", err, jsonByte, usuarioInput)
-		return
-	}
+	return
 }
