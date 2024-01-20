@@ -16,8 +16,8 @@ func ResponderErro(c echo.Context, statusCode int, err error) error {
 // ResponderString: responde a requisição com uma mensagem string
 func ResponderString(c echo.Context, statusCode int, mensagem string) error {
 	resposta := map[string]interface{}{
-		"mensagem":   mensagem,
-		"statuscode": statusCode,
+		"mensagem": mensagem,
+		//"statuscode": statusCode,
 	}
 	return c.JSON(statusCode, resposta)
 }

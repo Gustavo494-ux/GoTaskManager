@@ -17,8 +17,7 @@ func CriarUsuario(u *models.Usuario) (err error) {
 		return
 	}
 
-	u.Email_Hash = utils.GerarHash(u.Email)
-	u.Senha = utils.GerarHash(u.Senha)
+	PreencherCamposHash(u)
 
 	if err = repositorio.CriarUsuario(u); err != nil {
 		return
@@ -50,6 +49,29 @@ func BuscarUsuarioPorId(id uint) (usuario *models.Usuario, err error) {
 	return
 }
 
+// AtualizarUsuario: atualiza dos dados do usuário no banco de dados
+func AtualizarUsuario(usuario *models.Usuario, id uint) (err error) {
+	if err = models.ValidarDados(usuario); err != nil {
+		return
+	}
+
+	usuarioBanco := repositorio.BuscarUsuarioPorId(id)
+	if usuarioBanco.ID == 0 {
+		err = errors.New("nenhum usuário encontrado")
+		logger.Logger().Info("nenhum usuário encontrado", id)
+		return
+	}
+
+	usuario.Model = usuarioBanco.Model
+	PreencherCamposHash(usuario)
+
+	if err = repositorio.AtualizarUsuario(usuario); err != nil {
+		logger.Logger().Error("Ocorreu um erro ao atualizar o usuário", err, usuario)
+		return
+	}
+	return
+}
+
 // TratarUsuarioParaResposta: trata o usuário para responder a solicitação de forma adequada
 func TratarUsuarioParaResposta(usuariosInput ...*models.Usuario) {
 	for _, usuarioInput := range usuariosInput {
@@ -75,4 +97,9 @@ func TratarUsuarioParaResposta(usuariosInput ...*models.Usuario) {
 		}
 	}
 	return
+}
+
+func PreencherCamposHash(u *models.Usuario) {
+	u.Email_Hash = utils.GerarHash(u.Email)
+	u.Senha = utils.GerarHash(u.Senha)
 }

@@ -32,3 +32,11 @@ func BuscarUsuarioPorId(id uint) (usuarios *models.Usuario) {
 	configuracoes.BancoPrincipalGORM.First(&usuarios, id)
 	return
 }
+
+// AtualizarUsuario: atualiza dos dados do usuário no banco de dados
+func AtualizarUsuario(usuario *models.Usuario) (err error) {
+	if err = configuracoes.BancoPrincipalGORM.Save(usuario).Error; err != nil {
+		logger.Logger().Error("Ocorreu um erro ao realizar a atualização do usuário", err, usuario)
+	}
+	return
+}

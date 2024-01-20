@@ -4,6 +4,7 @@ import (
 	"GoTaskManager/internal/app/models"
 	"GoTaskManager/internal/app/services"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -78,7 +79,29 @@ func BuscarTodosUsuarios(c echo.Context) error {
 
 // AtualizarUsuario atualiza as informações do usuário no banco de dados.
 func AtualizarUsuario(c echo.Context) error {
-	return c.JSON(http.StatusNotFound, "Rota em desenvolvimento")
+	usuarioId, err := strconv.Atoi(c.Param("usuarioId"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	var usuario models.Usuario
+
+	if err := json.NewDecoder(c.Request().Body).Decode(&usuario); err != nil {
+		msg := logger.Logger().Error("Ocorreu um erro ao desserializar o corpo da requisição", err, usuario).RetornarMensagem()
+		return ResponderErro(c,
+			http.StatusBadRequest,
+			errors.New(msg),
+		)
+	}
+
+	if err := services.AtualizarUsuario(&usuario, uint(usuarioId)); err != nil {
+		return ResponderErro(c,
+			http.StatusBadRequest,
+			err,
+		)
+	}
+
+	return ResponderString(c, http.StatusOK, "usuário atualizado")
 }
 
 // DeletarUsuario Deleta um usuário do banco de dados.
