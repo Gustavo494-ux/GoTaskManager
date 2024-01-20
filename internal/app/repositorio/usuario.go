@@ -40,3 +40,11 @@ func AtualizarUsuario(usuario *models.Usuario) (err error) {
 	}
 	return
 }
+
+// DeletarUsuario: deleta o usuário do banco de dados
+func DeletarUsuario(usuario *models.Usuario) (err error) {
+	if err = configuracoes.BancoPrincipalGORM.Delete(usuario).Error; err != nil {
+		logger.Logger().Error("Ocorreu um erro ao deletar o usuário", err, usuario)
+	}
+	return
+}

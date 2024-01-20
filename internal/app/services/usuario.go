@@ -72,6 +72,22 @@ func AtualizarUsuario(usuario *models.Usuario, id uint) (err error) {
 	return
 }
 
+// DeletarUsuario: deleta os dados do usuário no banco
+func DeletarUsuario(id uint) (err error) {
+	usuario := repositorio.BuscarUsuarioPorId(id)
+	if usuario.ID == 0 {
+		err = errors.New("nenhum usuário encontrado")
+		logger.Logger().Info("nenhum usuário encontrado", id)
+		return
+	}
+
+	if err = repositorio.DeletarUsuario(usuario); err != nil {
+		logger.Logger().Error("Ocorreu um erro ao atualizar o usuário", err, usuario)
+		return
+	}
+	return
+}
+
 // TratarUsuarioParaResposta: trata o usuário para responder a solicitação de forma adequada
 func TratarUsuarioParaResposta(usuariosInput ...*models.Usuario) {
 	for _, usuarioInput := range usuariosInput {

@@ -106,5 +106,16 @@ func AtualizarUsuario(c echo.Context) error {
 
 // DeletarUsuario Deleta um usuário do banco de dados.
 func DeletarUsuario(c echo.Context) error {
-	return c.JSON(http.StatusNotFound, "Rota em desenvolvimento")
+	usuarioId, err := strconv.Atoi(c.Param("usuarioId"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	if err := services.DeletarUsuario(uint(usuarioId)); err != nil {
+		return ResponderErro(c,
+			http.StatusBadRequest,
+			err,
+		)
+	}
+	return ResponderString(c, http.StatusOK, "usuário deletado")
 }
