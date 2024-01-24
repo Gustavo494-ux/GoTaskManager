@@ -5,14 +5,13 @@ import (
 	"GoTaskManager/internal/app/inicializar/inicializarinternal"
 	"GoTaskManager/internal/app/models"
 	"fmt"
+	clientehttp "github.com/Gustavo494-ux/PacotesGolang/clienteHttp"
+	"github.com/Gustavo494-ux/PacotesGolang/logger"
 	"net/http"
 	"os"
 	"strconv"
 	"testing"
 	"time"
-
-	"github.com/Gustavo494-ux/PacotesGolang/clienteHttp"
-	"github.com/Gustavo494-ux/PacotesGolang/logger"
 )
 
 var (
@@ -47,17 +46,19 @@ func TestMain(m *testing.M) {
 func TestCriarUsuario(t *testing.T) {
 	URLCriarUsuario = URLbase + "usuario"
 	t.Parallel()
+	tempo := time.Now()
+
 	if len(Usuarios) == 0 {
 		logger.Logger().Error(fmt.Sprintf("Teste %s: Nenhum usuário foi passado para a realização do teste", t.Name()), nil)
 		t.FailNow()
 	}
-	tempo := time.Now()
-	for _, usuario := range Usuarios {
-		requisicao := clientehttp.POST(URLCriarUsuario, usuario)
-		statusCodeRequisicao := requisicao.GetStatusCode()
 
-		if statusCodeRequisicao != http.StatusOK {
-			logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(), strconv.Itoa(statusCodeRequisicao), http.StatusOK), nil)
+	for _, usuario := range Usuarios {
+
+		requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
+		if requisicao.GetStatusCode() != http.StatusOK {
+			logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
+				strconv.Itoa(requisicao.GetStatusCode()), http.StatusOK), nil)
 			t.FailNow()
 		}
 	}

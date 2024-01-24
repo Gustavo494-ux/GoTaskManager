@@ -69,10 +69,10 @@ func AtualizarUsuario(c echo.Context) error {
 	var usuario models.Usuario
 
 	if err := json.NewDecoder(c.Request().Body).Decode(&usuario); err != nil {
-		msg := logger.Logger().Error("Ocorreu um erro ao desserializar o corpo da requisição", err, usuario).RetornarMensagem()
+		logger.Logger().Error("Ocorreu um erro ao desserializar o corpo da requisição", err, usuario)
 		return ResponderErro(c,
 			http.StatusBadRequest,
-			errors.New(msg),
+			errors.New("Ocorreu um erro ao desserializar o corpo da requisição"),
 		)
 	}
 

@@ -23,3 +23,4 @@ go.work
 internal/build/buildTeste.bat
 internal/app/__debug*
 *.env
+.idea
