@@ -7,8 +7,10 @@ import (
 	"fmt"
 	clientehttp "github.com/Gustavo494-ux/PacotesGolang/clienteHttp"
 	"github.com/Gustavo494-ux/PacotesGolang/logger"
+	"math/rand"
 	"net/http"
 	"os"
+	"reflect"
 	"strconv"
 	"testing"
 	"time"
@@ -43,28 +45,52 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
+// Testes
 func TestCriarUsuario(t *testing.T) {
-	URLCriarUsuario = URLbase + "usuario"
 	t.Parallel()
-	tempo := time.Now()
+	URLCriarUsuario = URLbase + "usuario"
 
 	if len(Usuarios) == 0 {
 		logger.Logger().Error(fmt.Sprintf("Teste %s: Nenhum usuário foi passado para a realização do teste", t.Name()), nil)
 		t.FailNow()
 	}
-
-	for _, usuario := range Usuarios {
-
-		requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
-		if requisicao.GetStatusCode() != http.StatusOK {
-			logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
-				strconv.Itoa(requisicao.GetStatusCode()), http.StatusOK), nil)
-			t.FailNow()
+	t.Run("CriarUsuarioComSucesso", func(t *testing.T) {
+		for _, usuario := range Usuarios {
+			CriarUsuarioSucesso(t, usuario)
 		}
-	}
-	logger.Logger().Info(fmt.Sprintf("Teste %s:	Executado com sucesso! tempo decorrido: %s", t.Name(), time.Since(tempo).Abs().String()))
+	})
+
+	t.Run("CriarUsuarioCorpoInvalido", func(t *testing.T) {
+		var ponteiroUsuarios *[]models.Usuario = &Usuarios
+		LimparCampoAleatorio(ponteiroUsuarios)
+		for _, usuario := range *ponteiroUsuarios {
+			CriarUsuarioCorpoInvalido(t, usuario)
+		}
+	})
+
+	logger.Logger().Info(fmt.Sprintf("Teste %s:	Executado com sucesso!", t.Name()))
 }
 
+// SubTestes
+func CriarUsuarioSucesso(t *testing.T, usuario models.Usuario) {
+	requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
+	if requisicao.GetStatusCode() != http.StatusOK {
+		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
+			strconv.Itoa(requisicao.GetStatusCode()), http.StatusOK), nil)
+		t.FailNow()
+	}
+}
+
+func CriarUsuarioCorpoInvalido(t *testing.T, usuario models.Usuario) {
+	requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
+	if requisicao.GetStatusCode() != http.StatusBadRequest {
+		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
+			strconv.Itoa(requisicao.GetStatusCode()), http.StatusBadRequest), nil)
+		t.FailNow()
+	}
+}
+
+// Funções utilitarias
 func mockUsuarios() {
 	Usuarios = []models.Usuario{
 		{Nome: "João Silva", CPF: "12345678903", Email: "test@example.com", Senha: "senha123"},
@@ -77,5 +103,35 @@ func mockUsuarios() {
 		{Nome: "Fernanda", CPF: "12345678002", Email: "fernanda@gmail.com", Senha: "senha123"},
 		{Nome: "Gustavo", CPF: "12345678955", Email: "gustavo@gmail.com", Senha: "senha12345"},
 		{Nome: "Roberto", CPF: "11122233344", Email: "roberto@gmail.com", Senha: "senha123"},
+	}
+}
+
+func LimparCampoAleatorio(usuarios *[]models.Usuario) {
+	// Inicializa o gerador de números aleatórios
+	rand.Seed(time.Now().UnixNano())
+
+	campos := []string{"Nome", "CPF", "Email", "Senha"}
+	var campo string
+
+	for i := range *usuarios {
+		campo = campos[rand.Intn(len(campos))]
+		val := reflect.ValueOf(&(*usuarios)[i]).Elem()
+		fieldVal := val.FieldByName(campo)
+		if fieldVal.IsValid() && fieldVal.CanSet() {
+			switch fieldVal.Kind() {
+			case reflect.String:
+				fieldVal.SetString("")
+			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+				fieldVal.SetInt(0)
+			case reflect.Float32, reflect.Float64:
+				fieldVal.SetFloat(0)
+			case reflect.Bool:
+				fieldVal.SetBool(false)
+			default:
+				panic(fmt.Sprintf("Não é possível definir o valor do campo %s", campo))
+			}
+		} else {
+			panic(fmt.Sprintf("Campo %s inválido", campo))
+		}
 	}
 }
