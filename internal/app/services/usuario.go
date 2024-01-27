@@ -6,7 +6,6 @@ import (
 	"GoTaskManager/internal/utils"
 	"encoding/json"
 	"errors"
-
 	"github.com/Gustavo494-ux/PacotesGolang/GerenciadordeJson"
 	"github.com/Gustavo494-ux/PacotesGolang/logger"
 )
@@ -14,6 +13,10 @@ import (
 // CriarUsuario: cria um novo usuário no banco de dados
 func CriarUsuario(u *models.Usuario) (err error) {
 	if err = models.ValidarDados(u); err != nil {
+		return
+	}
+
+	if err = VerificarSeUsuarioExiste(*u); err != nil {
 		return
 	}
 
@@ -31,6 +34,16 @@ func BuscarUsuarioPorEmail(email string) (usuario *models.Usuario, err error) {
 		err = errors.New("email não informado")
 	}
 	usuario = repositorio.BuscarUsuarioPorEmail(email)
+	TratarUsuarioParaResposta(usuario)
+	return
+}
+
+// BuscarUsuarioPorCPF: busca um usuário no banco de dados pelo seu CPF
+func BuscarUsuarioPorCPF(cpf string) (usuario *models.Usuario, err error) {
+	if cpf == "" {
+		err = errors.New("CPF não informado")
+	}
+	usuario = repositorio.BuscarUsuarioPorCPF(cpf)
 	TratarUsuarioParaResposta(usuario)
 	return
 }
@@ -118,4 +131,19 @@ func TratarUsuarioParaResposta(usuariosInput ...*models.Usuario) {
 func PreencherCamposHash(u *models.Usuario) {
 	u.Email_Hash = utils.GerarHash(u.Email)
 	u.Senha = utils.GerarHash(u.Senha)
+}
+
+// VerificarSeUsuarioExiste: verifica se algum atributo único esta presente em mais de 1 registro
+func VerificarSeUsuarioExiste(u models.Usuario) (err error) {
+	usuario := repositorio.BuscarUsuarioPorCPF(u.CPF)
+	if usuario.ID != 0 {
+		return errors.New("já existe um usuário com este CPF")
+	}
+
+	usuario = repositorio.BuscarUsuarioPorEmail(u.Email)
+	if usuario.ID != 0 {
+		return errors.New("já existe um usuário com este email")
+	}
+
+	return nil
 }

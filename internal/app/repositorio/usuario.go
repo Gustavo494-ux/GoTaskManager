@@ -21,6 +21,12 @@ func BuscarUsuarioPorEmail(email string) (usuario *models.Usuario) {
 	return
 }
 
+// BuscarUsuarioPorCPF: busca um usuário no banco de dados pelo seu CPF
+func BuscarUsuarioPorCPF(cpf string) (usuario *models.Usuario) {
+	configuracoes.BancoPrincipalGORM.Where("cpf =?", cpf).First(&usuario)
+	return
+}
+
 // BuscarTodosUsuarios: busca todos os usuários do banco de dados
 func BuscarTodosUsuarios() (usuarios []*models.Usuario) {
 	configuracoes.BancoPrincipalGORM.Find(&usuarios)

@@ -17,9 +17,8 @@ func CriarUsuario(c echo.Context) (err error) {
 	var novoUsuario *models.Usuario
 	json.NewDecoder(c.Request().Body).Decode(&novoUsuario)
 	if err = services.CriarUsuario(novoUsuario); err != nil {
-
 		logger.Logger().Error("Ocorreu um erro criar o usuário", err, novoUsuario)
-		return c.JSON(http.StatusBadRequest, err)
+		return ResponderErro(c, http.StatusBadRequest, err)
 	}
 	return ResponderString(c, http.StatusOK, "O usuário foi criado com sucesso!")
 }
@@ -28,12 +27,12 @@ func CriarUsuario(c echo.Context) (err error) {
 func BuscarUsuarioPorId(c echo.Context) error {
 	usuarioId, err := strconv.Atoi(c.Param("usuarioId"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return ResponderErro(c, http.StatusBadRequest, err)
 	}
 
 	usuario, err := services.BuscarUsuarioPorId(uint(usuarioId))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return ResponderErro(c, http.StatusInternalServerError, err)
 	}
 
 	return ResponderUsuario(c, http.StatusOK, "", usuario)
@@ -44,7 +43,7 @@ func BuscarUsuarioPorEmail(c echo.Context) error {
 	email := c.Param("email")
 	usuario, err := services.BuscarUsuarioPorEmail(email)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return ResponderErro(c, http.StatusBadRequest, err)
 	}
 
 	return ResponderUsuario(c, http.StatusOK, "", usuario)
@@ -54,7 +53,7 @@ func BuscarUsuarioPorEmail(c echo.Context) error {
 func BuscarTodosUsuarios(c echo.Context) error {
 	usuarios, err := services.BuscarTodosUsuarios()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return ResponderErro(c, http.StatusInternalServerError, err)
 	}
 	return ResponderUsuario(c, http.StatusOK, "", usuarios...)
 }
@@ -63,7 +62,7 @@ func BuscarTodosUsuarios(c echo.Context) error {
 func AtualizarUsuario(c echo.Context) error {
 	usuarioId, err := strconv.Atoi(c.Param("usuarioId"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return ResponderErro(c, http.StatusBadRequest, err)
 	}
 
 	var usuario models.Usuario
@@ -90,7 +89,7 @@ func AtualizarUsuario(c echo.Context) error {
 func DeletarUsuario(c echo.Context) error {
 	usuarioId, err := strconv.Atoi(c.Param("usuarioId"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return ResponderErro(c, http.StatusBadRequest, err)
 	}
 
 	if err := services.DeletarUsuario(uint(usuarioId)); err != nil {
