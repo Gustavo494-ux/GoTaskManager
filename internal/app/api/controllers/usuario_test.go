@@ -4,7 +4,9 @@ import (
 	"GoTaskManager/internal/app/inicializar"
 	"GoTaskManager/internal/app/inicializar/inicializarinternal"
 	"GoTaskManager/internal/app/models"
+	"encoding/json"
 	"fmt"
+	"github.com/Gustavo494-ux/PacotesGolang/authentication"
 	"math/rand"
 	"net/http"
 	"os"
@@ -82,6 +84,46 @@ func TestCriarUsuario(t *testing.T) {
 			CriarUsuarioExistente(t, usuario)
 		}
 	})
+
+	logger.Logger().Info(fmt.Sprintf("Teste %s:	Executado com sucesso!", t.Name()))
+}
+
+func TestBuscarTodosUsuarios(t *testing.T) {
+	DeletarTodosUsuarios()
+	PopularUsuarios()
+
+	cabecalho := montarCabecalhoToken(Usuarios[0])
+	if cabecalho == nil {
+		logger.Logger().Error(fmt.Sprintf("Teste %s: o cabecalho da requisição não pode ser nulo", t.Name()),
+			nil)
+		t.FailNow()
+	}
+
+	URl := fmt.Sprintf("%s%s", URLbase, "usuario")
+	requisicao := clientehttp.Requisicao("GET", URl, nil, cabecalho)
+
+	if requisicao.GetStatusCode() != http.StatusOK {
+		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
+			strconv.Itoa(requisicao.GetStatusCode()), http.StatusOK), nil)
+		t.FailNow()
+	}
+
+	bodyRequisicao, err := requisicao.GetBody()
+	if err != nil {
+		logger.Logger().Error(fmt.Sprintf("Teste %s: Ocorreu um erro ao retornar o body da requisição", t.Name()), err)
+		t.FailNow()
+	}
+
+	var usuarios []models.Usuario
+	if err = json.Unmarshal(bodyRequisicao, &usuarios); err != nil {
+		logger.Logger().Error(fmt.Sprintf("Teste %s: Ocorreu um erro ao desserializar o body da requisição", t.Name()), err)
+		t.FailNow()
+	}
+
+	if len(usuarios) == 0 {
+		logger.Logger().Error(fmt.Sprintf("Teste %s: Nenhum usuário foi retornado pela requisição", t.Name()), nil)
+		t.FailNow()
+	}
 
 	logger.Logger().Info(fmt.Sprintf("Teste %s:	Executado com sucesso!", t.Name()))
 }
@@ -179,4 +221,20 @@ func PopularUsuarios() {
 
 func DeletarTodosUsuarios() {
 	configuracoes.BancoPrincipalGORM.Unscoped().Where("1=1").Delete(&models.Usuario{})
+}
+
+func montarCabecalhoToken(usuario models.Usuario) (cabecalho map[string]string) {
+	token, err :=
+		authentication.
+			NovoToken(true, time.Now().Add(time.Minute*10).Unix()).
+			AdicionarParametro("idUsuario", usuario.ID).
+			Criar()
+	if err != nil {
+		logger.Logger().Error("ocorreu um erro ao criar um token", err, token)
+	}
+
+	cabecalho = map[string]string{
+		"Authorization": "Bearer " + token,
+	}
+	return
 }
