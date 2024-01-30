@@ -6,7 +6,6 @@ import (
 	"GoTaskManager/internal/app/models"
 	"encoding/json"
 	"fmt"
-	"github.com/Gustavo494-ux/PacotesGolang/authentication"
 	"math/rand"
 	"net/http"
 	"os"
@@ -14,6 +13,8 @@ import (
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/Gustavo494-ux/PacotesGolang/authentication"
 
 	clientehttp "github.com/Gustavo494-ux/PacotesGolang/clienteHttp"
 	"github.com/Gustavo494-ux/PacotesGolang/configuracoes"
@@ -56,10 +57,7 @@ func TestCriarUsuario(t *testing.T) {
 	t.Parallel()
 	URLCriarUsuario = URLbase + "usuario"
 
-	if len(Usuarios) == 0 {
-		logger.Logger().Error(fmt.Sprintf("Teste %s: Nenhum usuário foi passado para a realização do teste", t.Name()), nil)
-		t.FailNow()
-	}
+	VerificarSeUsuarioVazio(t, Usuarios...)
 
 	t.Run("CriarUsuarioComSucesso", func(t *testing.T) {
 		DeletarTodosUsuarios()
@@ -88,18 +86,15 @@ func TestCriarUsuario(t *testing.T) {
 	logger.Logger().Info(fmt.Sprintf("Teste %s:	Executado com sucesso!", t.Name()))
 }
 
+// criar funcoes para tudo que puder ser reaproveitado, separar em outro pacote de util tudo que for generico
 func TestBuscarTodosUsuarios(t *testing.T) {
+	URl := fmt.Sprintf("%s%s", URLbase, "usuario")
+
 	DeletarTodosUsuarios()
 	PopularUsuarios()
 
-	cabecalho := montarCabecalhoToken(Usuarios[0])
-	if cabecalho == nil {
-		logger.Logger().Error(fmt.Sprintf("Teste %s: o cabecalho da requisição não pode ser nulo", t.Name()),
-			nil)
-		t.FailNow()
-	}
+	cabecalho := montarCabecalhoToken(t, Usuarios[0])
 
-	URl := fmt.Sprintf("%s%s", URLbase, "usuario")
 	requisicao := clientehttp.Requisicao("GET", URl, nil, cabecalho)
 
 	if requisicao.GetStatusCode() != http.StatusOK {
@@ -120,16 +115,14 @@ func TestBuscarTodosUsuarios(t *testing.T) {
 		t.FailNow()
 	}
 
-	if len(usuarios) == 0 {
-		logger.Logger().Error(fmt.Sprintf("Teste %s: Nenhum usuário foi retornado pela requisição", t.Name()), nil)
-		t.FailNow()
-	}
+	VerificarSeUsuarioVazio(t, Usuarios...)
 
 	logger.Logger().Info(fmt.Sprintf("Teste %s:	Executado com sucesso!", t.Name()))
 }
 
 // SubTestes
 func CriarUsuarioSucesso(t *testing.T, usuario models.Usuario) {
+	VerificarSeUsuarioVazio(t, usuario)
 	requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
 	if requisicao.GetStatusCode() != http.StatusOK {
 		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
@@ -139,6 +132,7 @@ func CriarUsuarioSucesso(t *testing.T, usuario models.Usuario) {
 }
 
 func CriarUsuarioCorpoInvalido(t *testing.T, usuario models.Usuario) {
+	VerificarSeUsuarioVazio(t, usuario)
 	requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
 	if requisicao.GetStatusCode() != http.StatusBadRequest {
 		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
@@ -148,6 +142,7 @@ func CriarUsuarioCorpoInvalido(t *testing.T, usuario models.Usuario) {
 }
 
 func CriarUsuarioExistente(t *testing.T, usuario models.Usuario) {
+	VerificarSeUsuarioVazio(t, usuario)
 	PopularUsuarios()
 	requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
 	if requisicao.GetStatusCode() != http.StatusBadRequest {
@@ -158,6 +153,25 @@ func CriarUsuarioExistente(t *testing.T, usuario models.Usuario) {
 }
 
 // Funções utilitarias
+
+func VerificarSeUsuarioVazio(t *testing.T, usuarios ...models.Usuario) (existe bool) {
+	defer func() {
+		if !existe {
+			logger.Logger().Error(fmt.Sprintf("Teste %s: Nenhum usuário foi passado para a realização do teste", t.Name()), nil)
+			t.FailNow()
+		}
+	}()
+	if usuarios == nil {
+		return false
+	}
+
+	if len(usuarios) == 0 {
+		return false
+	}
+
+	return true
+}
+
 func mockUsuarios() {
 	Usuarios = []models.Usuario{
 		{Nome: "João Silva", CPF: "12345678903", Email: "test@example.com", Senha: "senha123"},
@@ -223,14 +237,31 @@ func DeletarTodosUsuarios() {
 	configuracoes.BancoPrincipalGORM.Unscoped().Where("1=1").Delete(&models.Usuario{})
 }
 
-func montarCabecalhoToken(usuario models.Usuario) (cabecalho map[string]string) {
+func montarCabecalhoToken(t *testing.T, usuario models.Usuario) (cabecalho map[string]string) {
+	VerificarSeUsuarioVazio(t, usuario)
+	defer func() {
+		if cabecalho == nil {
+			logger.Logger().Error(fmt.Sprintf("Teste %s: o cabecalho da requisição não pode ser nulo", t.Name()),
+				nil)
+			t.FailNow()
+		}
+	}()
+
 	token, err :=
 		authentication.
 			NovoToken(true, time.Now().Add(time.Minute*10).Unix()).
 			AdicionarParametro("idUsuario", usuario.ID).
 			Criar()
 	if err != nil {
-		logger.Logger().Error("ocorreu um erro ao criar um token", err, token)
+		logger.Logger().Error(fmt.Sprintf("Teste %s: ocorreu um erro ao criar um token", t.Name()),
+			nil)
+		t.FailNow()
+	}
+
+	if token == "" {
+		logger.Logger().Error(fmt.Sprintf("Teste %s: o token não pode ser vazio", t.Name()),
+			nil)
+		t.FailNow()
 	}
 
 	cabecalho = map[string]string{

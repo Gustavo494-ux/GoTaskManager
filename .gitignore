@@ -24,3 +24,4 @@ internal/build/buildTeste.bat
 internal/app/__debug*
 *.env
 .idea
+/internal/app/Build
