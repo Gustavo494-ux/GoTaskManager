@@ -1,23 +1,18 @@
 package controllers
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/labstack/echo/v4"
 )
 
-// ResponderErro: responde a requisição com uma mensagem de erro
-func ResponderErro(c echo.Context, statusCode int, err error) error {
-	resposta := map[string]interface{}{
-		"erro": err.Error(),
-		// "statuscode": statusCode,
+// RetornarParametroInteiro: retorna um valor inteiro do parametro desejado
+func RetornarParametroInteiro(c echo.Context, parametro string) (valor int) {
+	valor, err := strconv.Atoi(c.Param(parametro))
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
 	}
-	return c.JSON(statusCode, resposta)
-}
-
-// ResponderString: responde a requisição com uma mensagem string
-func ResponderString(c echo.Context, statusCode int, mensagem string) error {
-	resposta := map[string]interface{}{
-		"mensagem": mensagem,
-		//"statuscode": statusCode,
-	}
-	return c.JSON(statusCode, resposta)
+	return
 }

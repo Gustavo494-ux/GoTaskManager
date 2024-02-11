@@ -26,15 +26,18 @@ func RetornarCorpoRequisicao(Request *http.Request) (corpo []byte, err error) {
 
 // ExtrairBodyEmStruct: extrai os dados do body para um objeto. o parametro dados deve ser um ponteiro
 // o parametro dados deve ser exatamente do tipo de dados esperado na requisição. Caso seja esperado uma lista o tipo deve ser um slice.
-func ExtrairBodyEmStruct(Request *http.Request, dados any) {
+func ExtrairBodyEmStruct(Request *http.Request, dados any) (err error) {
 	corpo, err := RetornarCorpoRequisicao(Request)
 	if err != nil {
 		logger.Logger().Error("Ocorreu um erro ao extrair o corpo da requisição", err)
+		return
 	}
 
-	if err := json.Unmarshal(corpo, dados); err != nil {
+	if err = json.Unmarshal(corpo, dados); err != nil {
 		logger.Logger().Error("Ocorreu um erro ao desserializar o body da requisição", err, corpo)
+		return
 	}
+	return
 }
 
 // ValidarBodyModel: valida o body da requisição como um model

@@ -6,7 +6,6 @@ import (
 	_ "github.com/Gustavo494-ux/PacotesGolang/tipo"
 	"github.com/labstack/echo/v4"
 
-	"GoTaskManager/internal/app/api/controllers"
 	"GoTaskManager/internal/app/api/middlewares"
 	"GoTaskManager/internal/app/models"
 	"GoTaskManager/internal/app/services"
@@ -20,11 +19,11 @@ func ValidarUsuarioInput(next echo.HandlerFunc) echo.HandlerFunc {
 		utils.ExtrairBodyEmStruct(c.Request(), &usuario)
 
 		if err := utils.ValidarBodyModel(usuario); err != nil {
-			return controllers.ResponderErro(c, http.StatusBadRequest, err)
+			return c.String(http.StatusBadRequest, err.Error())
 		}
 
 		if err := services.VerificarSeUsuarioExiste(usuario); err != nil {
-			return controllers.ResponderErro(c, http.StatusBadRequest, err)
+			return c.String(http.StatusBadRequest, err.Error())
 		}
 
 		return middlewares.ProximaFuncao(c, next)

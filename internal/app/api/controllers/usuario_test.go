@@ -1,9 +1,6 @@
 package controllers_test
 
 import (
-	"GoTaskManager/internal/app/inicializar"
-	"GoTaskManager/internal/app/inicializar/inicializarinternal"
-	"GoTaskManager/internal/app/models"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -15,10 +12,13 @@ import (
 	"time"
 
 	"github.com/Gustavo494-ux/PacotesGolang/authentication"
-
 	clientehttp "github.com/Gustavo494-ux/PacotesGolang/clienteHttp"
 	"github.com/Gustavo494-ux/PacotesGolang/configuracoes"
 	"github.com/Gustavo494-ux/PacotesGolang/logger"
+
+	"GoTaskManager/internal/app/inicializar"
+	"GoTaskManager/internal/app/inicializar/inicializarinternal"
+	"GoTaskManager/internal/app/models"
 )
 
 var (
@@ -122,11 +122,14 @@ func TestBuscarTodosUsuarios(t *testing.T) {
 
 // SubTestes
 func CriarUsuarioSucesso(t *testing.T, usuario models.Usuario) {
+	StatusCodeEsperado := http.StatusCreated
+
 	VerificarSeUsuarioVazio(t, usuario)
 	requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
-	if requisicao.GetStatusCode() != http.StatusOK {
+
+	if requisicao.GetStatusCode() != StatusCodeEsperado {
 		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
-			strconv.Itoa(requisicao.GetStatusCode()), http.StatusOK), nil)
+			strconv.Itoa(requisicao.GetStatusCode()), StatusCodeEsperado), nil)
 		t.FailNow()
 	}
 }
