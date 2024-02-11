@@ -7,9 +7,15 @@ import (
 )
 
 // ValidarDados: valida se o json recebido está de acordo as validações
-func ValidarDados(v interface{}) (err error) {
-	if v == nil {
-		return errors.New("o corpo da requisição não pode ser nulo")
+func ValidarDados(dados ...interface{}) (err error) {
+	if len(dados) == 0 {
+		return errors.New("dados não fornecidos")
 	}
-	return validator.Validate(v)
+
+	for _, dado := range dados {
+		if err = validator.Validate(dado); err != nil {
+			return err
+		}
+	}
+	return
 }

@@ -13,7 +13,7 @@ import (
 func Authenticate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		token := authentication.ExtrairToken(*c.Request())
-		if err := validarToken(c); err != nil {
+		if err := ValidarToken(c); err != nil {
 			logger.Logger().Info(fmt.Sprintf("Token %s inválido", token))
 			return c.JSON(http.StatusUnauthorized, "o token informado é inválido")
 		}
@@ -23,12 +23,12 @@ func Authenticate(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, "o token informado expirou")
 		}
 
-		return proximaFuncao(c, next)
+		return ProximaFuncao(c, next)
 	}
 }
 
 // validarToken: verifica se o token é inválido, se for retorna um erro
-func validarToken(e echo.Context) error {
+func ValidarToken(e echo.Context) error {
 	requisicao := *e.Request()
 	if erro := authentication.ValidarToken(requisicao); erro != nil {
 		logger.Logger().Info(fmt.Sprintf("Token %s inválido", authentication.ExtrairToken(requisicao)))
@@ -38,7 +38,7 @@ func validarToken(e echo.Context) error {
 }
 
 // proximaFuncao: executa a proxima função
-func proximaFuncao(e echo.Context, next echo.HandlerFunc) error {
+func ProximaFuncao(e echo.Context, next echo.HandlerFunc) error {
 	requisicao := *e.Request()
 	err := next(e)
 	if err != nil {
