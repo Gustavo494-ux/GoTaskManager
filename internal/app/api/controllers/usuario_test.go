@@ -1,7 +1,6 @@
 package controllers_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -12,7 +11,7 @@ import (
 	"time"
 
 	"github.com/Gustavo494-ux/PacotesGolang/authentication"
-	clientehttp "github.com/Gustavo494-ux/PacotesGolang/clienteHttp"
+	"github.com/Gustavo494-ux/PacotesGolang/clienteHttp"
 	"github.com/Gustavo494-ux/PacotesGolang/configuracoes"
 	"github.com/Gustavo494-ux/PacotesGolang/logger"
 
@@ -90,42 +89,30 @@ func TestCriarUsuario(t *testing.T) {
 func TestBuscarTodosUsuarios(t *testing.T) {
 	URl := fmt.Sprintf("%s%s", URLbase, "usuario")
 
-	DeletarTodosUsuarios()
-	PopularUsuarios()
+	t.Run("BuscarTodosUsuariosSucesso", func(t *testing.T) {
+		DeletarTodosUsuarios()
+		PopularUsuarios()
+		BuscarTodosUsuariosSucesso(t, URl)
+	})
 
-	cabecalho := montarCabecalhoToken(t, Usuarios[0])
-
-	requisicao := clientehttp.Requisicao("GET", URl, nil, cabecalho)
-
-	if requisicao.GetStatusCode() != http.StatusOK {
-		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
-			strconv.Itoa(requisicao.GetStatusCode()), http.StatusOK), nil)
-		t.FailNow()
-	}
-
-	bodyRequisicao, err := requisicao.GetBody()
-	if err != nil {
-		logger.Logger().Error(fmt.Sprintf("Teste %s: Ocorreu um erro ao retornar o body da requisição", t.Name()), err)
-		t.FailNow()
-	}
-
-	var usuarios []models.Usuario
-	if err = json.Unmarshal(bodyRequisicao, &usuarios); err != nil {
-		logger.Logger().Error(fmt.Sprintf("Teste %s: Ocorreu um erro ao desserializar o body da requisição", t.Name()), err)
-		t.FailNow()
-	}
+	t.Run("BuscarTodosUsuariosAutirizacaoExpirada", func(t *testing.T) {
+		DeletarTodosUsuarios()
+		PopularUsuarios()
+		BuscarTodosUsuariosNaoAutorizado(t, URl)
+	})
 
 	VerificarSeUsuarioVazio(t, Usuarios...)
-
 	logger.Logger().Info(fmt.Sprintf("Teste %s:	Executado com sucesso!", t.Name()))
 }
 
 // SubTestes
+
+// SubTestes de criar usuário
 func CriarUsuarioSucesso(t *testing.T, usuario models.Usuario) {
 	StatusCodeEsperado := http.StatusCreated
 
 	VerificarSeUsuarioVazio(t, usuario)
-	requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
+	requisicao := clienteHttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
 
 	if requisicao.GetStatusCode() != StatusCodeEsperado {
 		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
@@ -136,7 +123,7 @@ func CriarUsuarioSucesso(t *testing.T, usuario models.Usuario) {
 
 func CriarUsuarioCorpoInvalido(t *testing.T, usuario models.Usuario) {
 	VerificarSeUsuarioVazio(t, usuario)
-	requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
+	requisicao := clienteHttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
 	if requisicao.GetStatusCode() != http.StatusBadRequest {
 		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
 			strconv.Itoa(requisicao.GetStatusCode()), http.StatusBadRequest), nil)
@@ -147,12 +134,36 @@ func CriarUsuarioCorpoInvalido(t *testing.T, usuario models.Usuario) {
 func CriarUsuarioExistente(t *testing.T, usuario models.Usuario) {
 	VerificarSeUsuarioVazio(t, usuario)
 	PopularUsuarios()
-	requisicao := clientehttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
+	requisicao := clienteHttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
 	if requisicao.GetStatusCode() != http.StatusBadRequest {
 		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
 			strconv.Itoa(requisicao.GetStatusCode()), http.StatusBadRequest), nil)
 		t.FailNow()
 	}
+}
+
+//SubTestes de buscar Todos Usuários
+
+func BuscarTodosUsuariosSucesso(t *testing.T, URl string) {
+	var usuarios []models.Usuario
+	cabecalho := montarCabecalhoToken(t, time.Minute, Usuarios[0])
+	requisicao := clienteHttp.Requisicao("GET", URl, nil, cabecalho)
+
+	clienteHttp.ValidarStatusCodeRequisicaoTesting(t, requisicao, http.StatusOK)
+	requisicao.GetBodyStructTesting(t, &usuarios)
+
+	VerificarSeUsuarioVazio(t, Usuarios...)
+}
+
+func BuscarTodosUsuariosNaoAutorizado(t *testing.T, URl string) {
+	var usuarios []models.Usuario
+	cabecalho := montarCabecalhoToken(t, time.Second*0, Usuarios[0])
+	requisicao := clienteHttp.Requisicao("GET", URl, nil, cabecalho)
+
+	clienteHttp.ValidarStatusCodeRequisicaoTesting(t, requisicao, http.StatusOK)
+	requisicao.GetBodyStructTesting(t, &usuarios)
+
+	VerificarSeUsuarioVazio(t, Usuarios...)
 }
 
 // Funções utilitarias
@@ -240,7 +251,7 @@ func DeletarTodosUsuarios() {
 	configuracoes.BancoPrincipalGORM.Unscoped().Where("1=1").Delete(&models.Usuario{})
 }
 
-func montarCabecalhoToken(t *testing.T, usuario models.Usuario) (cabecalho map[string]string) {
+func montarCabecalhoToken(t *testing.T, Expiraem time.Duration, usuario models.Usuario) (cabecalho map[string]string) {
 	VerificarSeUsuarioVazio(t, usuario)
 	defer func() {
 		if cabecalho == nil {
@@ -252,7 +263,7 @@ func montarCabecalhoToken(t *testing.T, usuario models.Usuario) (cabecalho map[s
 
 	token, err :=
 		authentication.
-			NovoToken(true, time.Now().Add(time.Minute*10).Unix()).
+			NovoToken(true, time.Now().Add(Expiraem).Unix()).
 			AdicionarParametro("idUsuario", usuario.ID).
 			Criar()
 	if err != nil {
