@@ -3,7 +3,7 @@ module GoTaskManager
 go 1.20
 
 require (
-	github.com/Gustavo494-ux/PacotesGolang v0.0.6-0.20240213131631-bb8d52a4515e
+	github.com/Gustavo494-ux/PacotesGolang v0.0.6-0.20240220194205-d0340bb8afc4
 	github.com/labstack/echo/v4 v4.11.4
 	gorm.io/gorm v1.25.7
 )

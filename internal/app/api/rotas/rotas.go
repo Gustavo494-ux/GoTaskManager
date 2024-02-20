@@ -1,12 +1,14 @@
 package rotas
 
 import (
-	"GoTaskManager/internal/app/api/middlewares"
 	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
+	"GoTaskManager/internal/app/api/middlewares"
+
 )
 
 // GerarEcho: retorna uma instância de Echo configurada inclusive as rotas
@@ -29,7 +31,7 @@ func configurarMiddlewares(e *echo.Echo) {
 		LogRequestID:  true,
 		LogValuesFunc: middlewares.LoggerZeroLogPersonalizado,
 	}))
-
+	e.Use(middlewares.BancoDeDadosDisponivel)
 	e.Use(middleware.CORS())
 }
 

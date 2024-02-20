@@ -12,6 +12,8 @@ import (
 	"github.com/Gustavo494-ux/PacotesGolang/authentication"
 	"github.com/Gustavo494-ux/PacotesGolang/clienteHttp"
 	"github.com/Gustavo494-ux/PacotesGolang/configuracoes"
+	"github.com/Gustavo494-ux/PacotesGolang/database"
+	"github.com/Gustavo494-ux/PacotesGolang/inicializarpkg"
 	"github.com/Gustavo494-ux/PacotesGolang/logger"
 
 	"GoTaskManager/internal/app/inicializar"
@@ -53,49 +55,63 @@ func TestMain(m *testing.M) {
 func TestCriarUsuario(t *testing.T) {
 	type args struct {
 		Usuarios           []models.Usuario
-		StatusCodeEsperado int
-		funcaoInicializar  []func()
+		funcoesInicializar []func()
+		funcoesFinalizar   []func()
 	}
 
 	testes := []struct {
-		nome string
-		args args
+		nome               string
+		args               args
+		StatusCodeEsperado int
 	}{
 		{
 			nome: "CriarUsuarioComSucesso",
 			args: args{
 				Usuarios:           Usuarios,
-				StatusCodeEsperado: http.StatusCreated,
-				funcaoInicializar:  []func(){DeletarTodosUsuarios},
+				funcoesInicializar: []func(){DeletarTodosUsuarios},
 			},
+			StatusCodeEsperado: http.StatusCreated,
 		},
 		{
 			nome: "CriarUsuarioExistente",
 			args: args{
 				Usuarios:           Usuarios,
-				StatusCodeEsperado: http.StatusConflict,
-				funcaoInicializar:  []func(){DeletarTodosUsuarios, PopularUsuarios},
+				funcoesInicializar: []func(){DeletarTodosUsuarios, PopularUsuarios},
 			},
+			StatusCodeEsperado: http.StatusConflict,
 		},
 		{
 			nome: "CriarUsuarioCorpoInvalido",
 			args: args{
 				Usuarios:           LimparCampoAleatorio(Usuarios),
-				StatusCodeEsperado: http.StatusBadRequest,
-				funcaoInicializar:  []func(){DeletarTodosUsuarios},
+				funcoesInicializar: []func(){DeletarTodosUsuarios},
 			},
+			StatusCodeEsperado: http.StatusBadRequest,
+		},
+		{
+			nome: "CriarUsuarioBancoDeDadosIndisponivel",
+			args: args{
+				Usuarios: Usuarios,
+				funcoesInicializar: []func(){
+					func() {
+						database.DesconectarGorm(configuracoes.BancoPrincipalGORM)
+					},
+				},
+				funcoesFinalizar: []func(){inicializarpkg.InicializarBancoDeDadosTeste},
+			},
+			StatusCodeEsperado: http.StatusServiceUnavailable,
 		},
 	}
 
 	for _, teste := range testes {
+		for _, funcao := range teste.args.funcoesInicializar {
+			funcao()
+		}
+
 		t.Run(teste.nome, func(t *testing.T) {
 			var statusCode int
 			var err error
 			var corpo string
-
-			for _, funcao := range teste.args.funcaoInicializar {
-				funcao()
-			}
 
 			for _, usuario := range teste.args.Usuarios {
 				statusCode, corpo, err = CriarUsuario(usuario)
@@ -103,13 +119,16 @@ func TestCriarUsuario(t *testing.T) {
 					t.Errorf("teste %s: error = %v", t.Name(), err)
 				}
 
-				if statusCode != teste.args.StatusCodeEsperado {
+				if statusCode != teste.StatusCodeEsperado {
 					t.Errorf("teste %s: o status code recebido %d, é diferente do status code esperado %d. body da requisição %s",
-						t.Name(), statusCode, teste.args.StatusCodeEsperado, corpo)
+						t.Name(), statusCode, teste.StatusCodeEsperado, corpo)
 				}
 			}
-			fmt.Println(t.Name())
 		})
+
+		for _, funcao := range teste.args.funcoesFinalizar {
+			funcao()
+		}
 	}
 }
 
