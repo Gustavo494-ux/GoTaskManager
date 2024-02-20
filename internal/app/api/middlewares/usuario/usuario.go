@@ -23,7 +23,7 @@ func ValidarUsuarioInput(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		if err := services.VerificarSeUsuarioExiste(usuario); err != nil {
-			return c.String(http.StatusBadRequest, err.Error())
+			return c.String(http.StatusConflict, err.Error())
 		}
 
 		return middlewares.ProximaFuncao(c, next)

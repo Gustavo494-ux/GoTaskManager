@@ -1,15 +1,3 @@
-github.com/Gustavo494-ux/PacotesGolang v0.0.3 h1:ppWs2jb0oj7WVW9MhwKTMK8M3uYNIfySiM8cDt3DyFM=
-github.com/Gustavo494-ux/PacotesGolang v0.0.3/go.mod h1:AW9ldQ5IG7viLIMs3yWYtfGjHqjCfwmZAaLI9tWa+jU=
-github.com/Gustavo494-ux/PacotesGolang v0.0.4 h1:NtmlL9JCuwW+eUJW1AGcT4WmkJDchKYlC3lraTdhCQY=
-github.com/Gustavo494-ux/PacotesGolang v0.0.4/go.mod h1:AW9ldQ5IG7viLIMs3yWYtfGjHqjCfwmZAaLI9tWa+jU=
-github.com/Gustavo494-ux/PacotesGolang v0.0.5 h1:aEOtj6J6QSOe59n42V99VbSeIr+S0xUq6YnQZe5OG7c=
-github.com/Gustavo494-ux/PacotesGolang v0.0.5/go.mod h1:x8EwjAXRF1MuE6VKsx6j1RPl3vDmR7JhwK1TYIX5oSc=
-github.com/Gustavo494-ux/PacotesGolang v0.0.6-0.20240213112750-16e426d551be h1:eDY3r8h/5F0m1O7Bixq+ChvKNDFzm/bJTnkSVyHRiu0=
-github.com/Gustavo494-ux/PacotesGolang v0.0.6-0.20240213112750-16e426d551be/go.mod h1:x8EwjAXRF1MuE6VKsx6j1RPl3vDmR7JhwK1TYIX5oSc=
-github.com/Gustavo494-ux/PacotesGolang v0.0.6-0.20240213122203-359dd165b79c h1:fqrT6PkA+DkMGreYm9S+n0XoTFZqxtyOYp6HYniSrLA=
-github.com/Gustavo494-ux/PacotesGolang v0.0.6-0.20240213122203-359dd165b79c/go.mod h1:x8EwjAXRF1MuE6VKsx6j1RPl3vDmR7JhwK1TYIX5oSc=
-github.com/Gustavo494-ux/PacotesGolang v0.0.6-0.20240213131356-d92dfd9fd549 h1:ctp4BKP2jnaU3nJnFciykgh7JKXhPM/Ef0cm6E8c2GI=
-github.com/Gustavo494-ux/PacotesGolang v0.0.6-0.20240213131356-d92dfd9fd549/go.mod h1:x8EwjAXRF1MuE6VKsx6j1RPl3vDmR7JhwK1TYIX5oSc=
 github.com/Gustavo494-ux/PacotesGolang v0.0.6-0.20240213131631-bb8d52a4515e h1:eehVdnzrMTx7Qdym0MhYi1yqvx4b1v6zgtV5YQJ9eCU=
 github.com/Gustavo494-ux/PacotesGolang v0.0.6-0.20240213131631-bb8d52a4515e/go.mod h1:x8EwjAXRF1MuE6VKsx6j1RPl3vDmR7JhwK1TYIX5oSc=
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=

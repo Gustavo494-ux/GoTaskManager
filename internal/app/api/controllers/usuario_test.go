@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	"strconv"
 	"testing"
 	"time"
 
@@ -51,39 +50,89 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-// Testes
 func TestCriarUsuario(t *testing.T) {
-	t.Parallel()
-	URLCriarUsuario = URLbase + "usuario"
+	type args struct {
+		Usuarios           []models.Usuario
+		StatusCodeEsperado int
+		funcaoInicializar  []func()
+	}
 
-	VerificarSeUsuarioVazio(t, Usuarios...)
+	testes := []struct {
+		nome string
+		args args
+	}{
+		{
+			nome: "CriarUsuarioComSucesso",
+			args: args{
+				Usuarios:           Usuarios,
+				StatusCodeEsperado: http.StatusCreated,
+				funcaoInicializar:  []func(){DeletarTodosUsuarios},
+			},
+		},
+		{
+			nome: "CriarUsuarioExistente",
+			args: args{
+				Usuarios:           Usuarios,
+				StatusCodeEsperado: http.StatusConflict,
+				funcaoInicializar:  []func(){DeletarTodosUsuarios, PopularUsuarios},
+			},
+		},
+		{
+			nome: "CriarUsuarioCorpoInvalido",
+			args: args{
+				Usuarios:           LimparCampoAleatorio(Usuarios),
+				StatusCodeEsperado: http.StatusBadRequest,
+				funcaoInicializar:  []func(){DeletarTodosUsuarios},
+			},
+		},
+	}
 
-	t.Run("CriarUsuarioComSucesso", func(t *testing.T) {
-		DeletarTodosUsuarios()
-		for _, usuario := range Usuarios {
-			CriarUsuarioSucesso(t, usuario)
-		}
-	})
+	for _, teste := range testes {
+		t.Run(teste.nome, func(t *testing.T) {
+			var statusCode int
+			var err error
+			var corpo string
 
-	t.Run("CriarUsuarioCorpoInvalido", func(t *testing.T) {
-		DeletarTodosUsuarios()
-		var ponteiroUsuarios *[]models.Usuario = &Usuarios
-		LimparCampoAleatorio(ponteiroUsuarios)
+			for _, funcao := range teste.args.funcaoInicializar {
+				funcao()
+			}
 
-		for _, usuario := range *ponteiroUsuarios {
-			CriarUsuarioCorpoInvalido(t, usuario)
-		}
-	})
+			for _, usuario := range teste.args.Usuarios {
+				statusCode, corpo, err = CriarUsuario(usuario)
+				if err != nil {
+					t.Errorf("teste %s: error = %v", t.Name(), err)
+				}
 
-	t.Run("CriarUsuarioExistente", func(t *testing.T) {
-		DeletarTodosUsuarios()
-		for _, usuario := range Usuarios {
-			CriarUsuarioExistente(t, usuario)
-		}
-	})
-
-	logger.Logger().Info(fmt.Sprintf("Teste %s:	Executado com sucesso!", t.Name()))
+				if statusCode != teste.args.StatusCodeEsperado {
+					t.Errorf("teste %s: o status code recebido %d, é diferente do status code esperado %d. body da requisição %s",
+						t.Name(), statusCode, teste.args.StatusCodeEsperado, corpo)
+				}
+			}
+			fmt.Println(t.Name())
+		})
+	}
 }
+
+func CriarUsuario(usuario models.Usuario) (statusCode int, corpo string, err error) {
+	URLCriarUsuario := URLbase + "usuario"
+	if VerificarSeUsuarioVazio(usuario) {
+		err = fmt.Errorf("nenhum usuário pode estar vazio ou possuir valor nil")
+		return
+	}
+
+	requisicao := clienteHttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
+	statusCode = requisicao.GetStatusCode()
+
+	body, err := requisicao.GetBody()
+	if err != nil {
+		err = fmt.Errorf("ao recuperar o corpo da requisição ocorreu o erro: %v", err)
+	}
+
+	corpo = string(body)
+	return
+}
+
+//Refatorar daqui para baixo
 
 // criar funcoes para tudo que puder ser reaproveitado, separar em outro pacote de util tudo que for generico
 func TestBuscarTodosUsuarios(t *testing.T) {
@@ -101,45 +150,8 @@ func TestBuscarTodosUsuarios(t *testing.T) {
 		BuscarTodosUsuariosNaoAutorizado(t, URl)
 	})
 
-	VerificarSeUsuarioVazio(t, Usuarios...)
+	// VerificarSeUsuarioVazio(t, Usuarios...)
 	logger.Logger().Info(fmt.Sprintf("Teste %s:	Executado com sucesso!", t.Name()))
-}
-
-// SubTestes
-
-// SubTestes de criar usuário
-func CriarUsuarioSucesso(t *testing.T, usuario models.Usuario) {
-	StatusCodeEsperado := http.StatusCreated
-
-	VerificarSeUsuarioVazio(t, usuario)
-	requisicao := clienteHttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
-
-	if requisicao.GetStatusCode() != StatusCodeEsperado {
-		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
-			strconv.Itoa(requisicao.GetStatusCode()), StatusCodeEsperado), nil)
-		t.FailNow()
-	}
-}
-
-func CriarUsuarioCorpoInvalido(t *testing.T, usuario models.Usuario) {
-	VerificarSeUsuarioVazio(t, usuario)
-	requisicao := clienteHttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
-	if requisicao.GetStatusCode() != http.StatusBadRequest {
-		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
-			strconv.Itoa(requisicao.GetStatusCode()), http.StatusBadRequest), nil)
-		t.FailNow()
-	}
-}
-
-func CriarUsuarioExistente(t *testing.T, usuario models.Usuario) {
-	VerificarSeUsuarioVazio(t, usuario)
-	PopularUsuarios()
-	requisicao := clienteHttp.Requisicao("POST", URLCriarUsuario, usuario, nil)
-	if requisicao.GetStatusCode() != http.StatusBadRequest {
-		logger.Logger().Error(fmt.Sprintf("Teste %s: retornou o status code %s o status code esperado é %d", t.Name(),
-			strconv.Itoa(requisicao.GetStatusCode()), http.StatusBadRequest), nil)
-		t.FailNow()
-	}
 }
 
 //SubTestes de buscar Todos Usuários
@@ -152,7 +164,7 @@ func BuscarTodosUsuariosSucesso(t *testing.T, URl string) {
 	clienteHttp.ValidarStatusCodeRequisicaoTesting(t, requisicao, http.StatusOK)
 	requisicao.GetBodyStructTesting(t, &usuarios)
 
-	VerificarSeUsuarioVazio(t, Usuarios...)
+	// VerificarSeUsuarioVazio(t, Usuarios...)
 }
 
 func BuscarTodosUsuariosNaoAutorizado(t *testing.T, URl string) {
@@ -163,27 +175,21 @@ func BuscarTodosUsuariosNaoAutorizado(t *testing.T, URl string) {
 	clienteHttp.ValidarStatusCodeRequisicaoTesting(t, requisicao, http.StatusOK)
 	requisicao.GetBodyStructTesting(t, &usuarios)
 
-	VerificarSeUsuarioVazio(t, Usuarios...)
+	// VerificarSeUsuarioVazio(t, Usuarios...)
 }
 
 // Funções utilitarias
 
-func VerificarSeUsuarioVazio(t *testing.T, usuarios ...models.Usuario) (existe bool) {
-	defer func() {
-		if !existe {
-			logger.Logger().Error(fmt.Sprintf("Teste %s: Nenhum usuário foi passado para a realização do teste", t.Name()), nil)
-			t.FailNow()
-		}
-	}()
+func VerificarSeUsuarioVazio(usuarios ...models.Usuario) (existe bool) {
 	if usuarios == nil {
-		return false
+		return true
 	}
 
 	if len(usuarios) == 0 {
-		return false
+		return true
 	}
 
-	return true
+	return
 }
 
 func mockUsuarios() {
@@ -213,16 +219,20 @@ func mockUsuarios() {
 	}
 }
 
-func LimparCampoAleatorio(usuarios *[]models.Usuario) {
+func LimparCampoAleatorio(usuarios []models.Usuario) []models.Usuario {
 	// Inicializa o gerador de números aleatórios
 	rand.Seed(time.Now().UnixNano())
+
+	// Criar uma cópia local dos usuários para evitar modificar os valores originais
+	usuariosCopia := make([]models.Usuario, len(usuarios))
+	copy(usuariosCopia, usuarios)
 
 	campos := []string{"Nome", "CPF", "Email", "Senha"}
 	var campo string
 
-	for i := range *usuarios {
+	for i := range usuariosCopia {
 		campo = campos[rand.Intn(len(campos))]
-		val := reflect.ValueOf(&(*usuarios)[i]).Elem()
+		val := reflect.ValueOf(&usuariosCopia[i]).Elem()
 		fieldVal := val.FieldByName(campo)
 		if fieldVal.IsValid() && fieldVal.CanSet() {
 			switch fieldVal.Kind() {
@@ -241,6 +251,7 @@ func LimparCampoAleatorio(usuarios *[]models.Usuario) {
 			panic(fmt.Sprintf("Campo %s inválido", campo))
 		}
 	}
+	return usuariosCopia
 }
 
 func PopularUsuarios() {
@@ -252,7 +263,7 @@ func DeletarTodosUsuarios() {
 }
 
 func montarCabecalhoToken(t *testing.T, Expiraem time.Duration, usuario models.Usuario) (cabecalho map[string]string) {
-	VerificarSeUsuarioVazio(t, usuario)
+	// VerificarSeUsuarioVazio(t, usuario)
 	defer func() {
 		if cabecalho == nil {
 			logger.Logger().Error(fmt.Sprintf("Teste %s: o cabecalho da requisição não pode ser nulo", t.Name()),
